@@ -3,87 +3,197 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import Lightbox from '../components/Lightbox.astro';
+import LightboxScript from '../components/LightboxScript.astro';
 import { getAllProjects } from '../lib/sanity';
 
 const projects = await getAllProjects();
-const featured = projects.slice(0, 6);
+
+const categories = [
+  { value: 'all', label: 'All' },
+  { value: 'narrative', label: 'Narrative' },
+  { value: 'commercial', label: 'Commercial' },
+  { value: 'music-video', label: 'Music Video' },
+  { value: 'photography', label: 'Photography' },
+];
 ---
 
 <BaseLayout>
   <Header />
 
-  <main class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <h1 class="hero-title">David J Myrick</h1>
-        <p class="hero-subtitle">Director of Photography</p>
-      </div>
+  <main>
+    {/* ===== Hero ===== */}
+    <section class="hero">
+      <h1 class="hero-name">David J Myrick</h1>
+      <p class="hero-role">Director of Photography</p>
+    </section>
 
-      {featured.length > 0 && (
-        <section class="featured">
-          <div class="featured-grid">
-            {featured.map((project) => (
-              <ProjectCard
-                title={project.title}
-                slug={project.slug.current}
-                coverImage={project.coverImage}
-                hasVideo={!!project.vimeoUrl}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+    {/* ===== Filter bar ===== */}
+    <div class="filter-bar">
+      <div class="filter-inner container">
+        {categories.map(({ value, label }) => (
+          <button
+            class:list={['filter-btn', { active: value === 'all' }]}
+            data-filter={value}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
     </div>
+
+    {/* ===== Project tiles ===== */}
+    <section class="tile-stack">
+      {projects.map((project, i) => (
+        <div class="tile-item" data-category={project.category}>
+          <ProjectCard
+            id={project._id}
+            title={project.title}
+            coverImage={project.coverImage}
+            subcategory={project.subcategory}
+            director={project.director}
+            tileVideoUrl={project.tileVideoUrl}
+            index={i}
+          />
+        </div>
+      ))}
+    </section>
+
+    <p class="empty-state">No projects in this category yet.</p>
+
+    {/* ===== Lightboxes (one per project, hidden) ===== */}
+    {projects.map((project) => (
+      <Lightbox project={project} />
+    ))}
   </main>
 
   <Footer />
+  <LightboxScript />
 </BaseLayout>
 
+<script>
+  function initFilters() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const tiles = document.querySelectorAll<HTMLElement>('[data-category]');
+    const empty = document.querySelector<HTMLElement>('.empty-state');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter!;
+
+        buttons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        let visibleCount = 0;
+        tiles.forEach((tile) => {
+          const show = filter === 'all' || tile.dataset.category === filter;
+          tile.style.display = show ? '' : 'none';
+          if (show) visibleCount++;
+        });
+
+        if (empty) {
+          empty.style.display = visibleCount === 0 ? '' : 'none';
+        }
+      });
+    });
+
+    if (empty) empty.style.display = 'none';
+  }
+
+  initFilters();
+  document.addEventListener('astro:after-swap', initFilters);
+</script>
+
 <style>
+  /* ===== Hero ===== */
+
   .hero {
-    padding-top: calc(var(--nav-height) + 80px);
-  }
-
-  .hero-content {
+    padding-top: calc(var(--header-total) + var(--space-9));
+    padding-bottom: var(--space-9);
     text-align: center;
-    margin-bottom: 80px;
   }
 
-  .hero-title {
-    font-size: clamp(2.4rem, 6vw, 4.5rem);
-    font-weight: 300;
-    letter-spacing: 0.06em;
+  .hero-name {
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
     text-transform: uppercase;
-    line-height: 1.1;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+    color: var(--c-daylight);
   }
 
-  .hero-subtitle {
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
-    color: var(--color-text-muted);
-    margin-top: 16px;
-    letter-spacing: 0.12em;
+  .hero-role {
+    font-family: var(--font-utility);
+    font-size: var(--text-subhead);
+    font-weight: var(--weight-medium);
     text-transform: uppercase;
-    font-weight: 400;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-slate);
+    margin-top: var(--space-4);
   }
 
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 32px;
+  /* ===== Filter bar ===== */
+
+  .filter-bar {
+    border-top: 1px solid var(--c-negative);
+    border-bottom: 1px solid var(--c-negative);
+    margin-bottom: var(--space-1);
   }
 
-  @media (max-width: 768px) {
-    .hero {
-      padding-top: calc(var(--nav-height) + 48px);
-    }
+  .filter-inner {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+  }
 
-    .hero-content {
-      margin-bottom: 48px;
-    }
+  .filter-inner::-webkit-scrollbar {
+    display: none;
+  }
 
-    .featured-grid {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
+  .filter-btn {
+    font-family: var(--font-utility);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-utility);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-slate);
+    padding: var(--space-2) var(--space-4);
+    min-height: var(--tap-min);
+    white-space: nowrap;
+    border-radius: 2px;
+    transition: color var(--duration-sm) var(--ease-out),
+                background var(--duration-sm) var(--ease-out);
+  }
+
+  .filter-btn:hover {
+    color: var(--c-daylight);
+  }
+
+  .filter-btn.active {
+    color: var(--c-daylight);
+    background: var(--c-negative);
+  }
+
+  /* ===== Tile stack ===== */
+
+  .tile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* ===== Empty state ===== */
+
+  .empty-state {
+    text-align: center;
+    color: var(--c-slate);
+    padding: var(--space-9) 0;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    display: none;
   }
 </style>

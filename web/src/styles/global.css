@@ -15,6 +15,12 @@
   --c-daylight:  #e8e4df;   /* Primary text — warm off-white                   */
   --c-tungsten:  #c4a46a;   /* Accent — warm practical light, used sparingly   */
 
+  /* Derived / semi-transparent */
+  --c-glass:          color-mix(in srgb, var(--c-darkroom) 92%, transparent);
+  --c-backdrop:       rgba(0, 0, 0, 0.95);
+  --c-overlay:        rgba(0, 0, 0, 0.5);
+  --c-overlay-hover:  rgba(0, 0, 0, 0.7);
+
   /* --- Typography – Families --- */
   --font-display:  'Bebas Neue', sans-serif;          /* Titles, hero, tile overlay  */
   --font-body:     'Barlow', system-ui, sans-serif;   /* Bio, captions, form fields  */
@@ -53,9 +59,12 @@
   --space-10: 120px;
 
   /* --- Layout --- */
-  --max-width:    1400px;
-  --nav-height:   72px;
-  --tap-min:      48px;    /* Minimum touch target (WCAG / Apple HIG) */
+  --max-width:       1400px;
+  --nav-height:      72px;
+  --nav-grid-height: 88px;   /* Desktop editorial grid row below header bar */
+  --header-total:    72px;   /* Mobile/tablet: just the bar                 */
+  --tap-min:         48px;   /* Minimum touch target (WCAG / Apple HIG)     */
+  --max-width-content: 1100px; /* Lightbox player / gallery content width    */
 
   /* --- Tile Aspect Ratios (shift per breakpoint via class) --- */
   --ratio-cinematic: 2.39 / 1;   /* Desktop: anamorphic widescreen  */
@@ -96,6 +105,12 @@ body {
   color: var(--c-daylight);
   line-height: 1.6;
   min-height: 100dvh;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-total: calc(var(--nav-height) + var(--nav-grid-height));
+  }
 }
 
 img {

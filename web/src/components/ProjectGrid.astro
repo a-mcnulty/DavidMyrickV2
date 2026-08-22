@@ -10,13 +10,16 @@ const { projects } = Astro.props;
 ---
 
 {projects.length > 0 ? (
-  <div class="grid">
-    {projects.map((project) => (
+  <div class="tile-stack">
+    {projects.map((project, i) => (
       <ProjectCard
+        id={project._id}
         title={project.title}
-        slug={project.slug.current}
         coverImage={project.coverImage}
-        hasVideo={!!project.vimeoUrl}
+        subcategory={project.subcategory}
+        director={project.director}
+        tileVideoUrl={project.tileVideoUrl}
+        index={i}
       />
     ))}
   </div>
@@ -25,23 +28,17 @@ const { projects } = Astro.props;
 )}
 
 <style>
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 32px;
+  .tile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   .empty {
     text-align: center;
-    color: var(--color-text-muted);
-    padding: 80px 0;
-    font-size: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    .grid {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
+    color: var(--c-slate);
+    padding: var(--space-9) 0;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
   }
 </style>

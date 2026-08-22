@@ -1,28 +1,95 @@
 ---
 const year = new Date().getFullYear();
+
+const socialLinks = [
+  { label: 'Instagram', href: 'https://www.instagram.com/davidmyrick', icon: 'ig' },
+  { label: 'Vimeo', href: 'https://vimeo.com/davidmyrick', icon: 'vimeo' },
+  { label: 'IMDb', href: 'https://www.imdb.com/name/nm2101418/', icon: 'imdb' },
+];
 ---
 
 <footer class="footer">
   <div class="container footer-inner">
     <p class="copyright">&copy; {year} David J Myrick</p>
+
+    <div class="social">
+      {socialLinks.map(({ label, href, icon }) => (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          aria-label={label}
+        >
+          {icon === 'ig' && (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <circle cx="12" cy="12" r="5" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          )}
+          {icon === 'vimeo' && (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 7.42c-.1 2.13-1.58 5.05-4.47 8.76C14.54 19.87 12.07 22 10.05 22c-1.25 0-2.31-1.16-3.18-3.47-.58-2.12-1.16-4.25-1.73-6.37C4.56 9.85 3.93 8.7 3.24 8.7c-.16 0-.71.33-1.66 1l-1-.87C1.65 7.94 2.73 7.04 3.78 6.15c1.42-1.23 2.48-1.87 3.18-1.94 1.67-.16 2.7.98 3.09 3.44.42 2.65.71 4.3.87 4.94.49 2.2 1.02 3.3 1.6 3.3.45 0 1.13-.72 2.04-2.15.9-1.43 1.39-2.52 1.45-3.28.13-1.25-.36-1.88-1.48-1.88-.53 0-1.07.12-1.64.36 1.09-3.57 3.17-5.3 6.24-5.2 2.28.06 3.35 1.54 3.24 4.44z" />
+            </svg>
+          )}
+          {icon === 'imdb' && (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2 4v16h3.2V4H2zm4.8 0v16h2.8l.3-2c.5 1.4 1.3 2.2 2.6 2.2 1.5 0 2.2-1 2.2-3V4h-2.8v12.2c0 .7-.2 1-.6 1-.3 0-.6-.3-.8-.8V4H6.8zm9.2 0v16h2.6l.2-1.4c.6 1.1 1.4 1.6 2.4 1.6 1.8 0 2.7-1.4 2.7-4.2V9.6c0-2.8-.9-4.2-2.7-4.2-1 0-1.8.5-2.4 1.6L19 4h-3zm3.1 5.2c0-.8.2-1.2.7-1.2s.7.4.7 1.2v5.6c0 .8-.2 1.2-.7 1.2s-.7-.4-.7-1.2V9.2z" />
+            </svg>
+          )}
+        </a>
+      ))}
+    </div>
   </div>
 </footer>
 
 <style>
   .footer {
-    border-top: 1px solid var(--color-border);
-    padding: 32px 0;
-    margin-top: 80px;
+    border-top: 1px solid var(--c-negative);
+    padding: var(--space-6) 0;
+    margin-top: var(--space-9);
   }
 
   .footer-inner {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .footer-inner {
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
 
   .copyright {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    letter-spacing: 0.04em;
+    font-family: var(--font-utility);
+    font-size: var(--text-utility);
+    font-weight: var(--weight-medium);
+    color: var(--c-slate);
+    letter-spacing: var(--tracking-normal);
+    text-transform: uppercase;
+  }
+
+  .social {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    color: var(--c-slate);
+    transition: color var(--duration-sm) var(--ease-out);
+  }
+
+  .social-link:hover {
+    color: var(--c-daylight);
   }
 </style>

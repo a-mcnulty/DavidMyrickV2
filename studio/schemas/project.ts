@@ -36,42 +36,40 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'subcategory',
+      title: 'Type',
+      type: 'string',
+      description: 'Appears above the title on the tile (e.g. "Feature Film", "Music Video", "2nd Unit Cinematography").',
+    }),
+    defineField({
+      name: 'director',
+      title: 'Director',
+      type: 'string',
+      description: 'Appears below the title on the tile (e.g. "Phillips Brothers").',
+    }),
+    defineField({
       name: 'coverImage',
       title: 'Cover Image',
       type: 'image',
-      description: 'Main image shown in the grid. Use the hotspot tool to set the focal point.',
+      description: 'Poster image — shown while the tile video loads.',
       options: { hotspot: true },
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'gallery',
-      title: 'Image Gallery',
-      type: 'array',
-      description: 'Additional images for the project detail page.',
-      of: [
-        {
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: 'caption',
-              title: 'Caption',
-              type: 'string',
-            }),
-          ],
-        },
-      ],
+      name: 'tileVideoUrl',
+      title: 'Tile Video',
+      type: 'url',
+      description: 'Short clip that loops silently in the tile. Paste a Vimeo link (e.g. https://vimeo.com/123456789).',
+      validation: (rule) =>
+        rule.uri({ scheme: ['https'], allowRelative: false }),
     }),
     defineField({
-      name: 'vimeoUrl',
-      title: 'Vimeo URL',
+      name: 'fullVideoUrl',
+      title: 'Full Video',
       type: 'url',
-      description: 'Paste the full Vimeo link (e.g. https://vimeo.com/123456789). Leave blank for photo-only projects.',
+      description: 'The complete video shown when the tile is clicked. Paste a Vimeo link.',
       validation: (rule) =>
-        rule.uri({
-          scheme: ['https'],
-          allowRelative: false,
-        }),
+        rule.uri({ scheme: ['https'], allowRelative: false }),
     }),
     defineField({
       name: 'order',

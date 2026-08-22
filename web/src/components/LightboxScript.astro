@@ -1,0 +1,101 @@
+---
+// Handles: tile background video (IntersectionObserver), lightbox open/close, full video lifecycle.
+// Include once per page.
+---
+
+<script>
+  function init() {
+    // === Tile background videos: load Vimeo in background mode on scroll ===
+    const tileObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const tile = entry.target as HTMLElement;
+          const vimeoId = tile.dataset.tileVimeo;
+          if (!vimeoId) return;
+
+          if (entry.isIntersecting && !tile.classList.contains('has-video')) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1`;
+            iframe.className = 'tile-video';
+            iframe.setAttribute('loading', 'lazy');
+            iframe.setAttribute('tabindex', '-1');
+            const frame = tile.querySelector('.tile-frame');
+            if (frame) {
+              frame.appendChild(iframe);
+              tile.classList.add('has-video');
+            }
+          }
+        });
+      },
+      { rootMargin: '200px' }
+    );
+
+    document.querySelectorAll<HTMLElement>('[data-tile-vimeo]').forEach((tile) => {
+      tileObserver.observe(tile);
+    });
+
+    // === Lightbox open/close ===
+    const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
+    const lightboxes = document.querySelectorAll<HTMLElement>('[data-lightbox-id]');
+
+    function openLightbox(id: string) {
+      const lb = document.querySelector<HTMLElement>(`[data-lightbox-id="${id}"]`);
+      if (!lb) return;
+
+      // Inject the full video iframe on open
+      const wrapper = lb.querySelector<HTMLElement>('[data-full-vimeo-id]');
+      if (wrapper && !wrapper.querySelector('iframe')) {
+        const vimeoId = wrapper.dataset.fullVimeoId;
+        if (vimeoId) {
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&dnt=1`;
+          iframe.allow = 'autoplay; fullscreen';
+          iframe.allowFullscreen = true;
+          wrapper.appendChild(iframe);
+        }
+      }
+
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      lb.querySelector<HTMLButtonElement>('.lightbox-close')?.focus();
+    }
+
+    function closeLightbox(lb: HTMLElement) {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+
+      // Remove iframe to stop playback
+      const wrapper = lb.querySelector<HTMLElement>('[data-full-vimeo-id]');
+      const iframe = wrapper?.querySelector('iframe');
+      if (iframe) iframe.remove();
+    }
+
+    triggers.forEach((trigger) => {
+      const id = trigger.dataset.lightboxTrigger!;
+      trigger.addEventListener('click', () => openLightbox(id));
+      trigger.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox(id);
+        }
+      });
+    });
+
+    lightboxes.forEach((lb) => {
+      lb.querySelectorAll('[data-lightbox-close]').forEach((el) => {
+        el.addEventListener('click', () => closeLightbox(lb));
+      });
+    });
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        lightboxes.forEach((lb) => {
+          if (lb.classList.contains('open')) closeLightbox(lb);
+        });
+      }
+    });
+  }
+
+  init();
+  document.addEventListener('astro:after-swap', init);
+</script>

@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ProjectGrid from '../components/ProjectGrid.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Lightbox from '../components/Lightbox.astro';
+import LightboxScript from '../components/LightboxScript.astro';
 import { getProjectsByCategory } from '../lib/sanity';
 
 const projects = await getProjectsByCategory('commercial');
@@ -10,25 +12,64 @@ const projects = await getProjectsByCategory('commercial');
 
 <BaseLayout title="Commercial — David J Myrick">
   <Header />
-  <main class="page">
-    <div class="container">
+  <main>
+    <section class="page-header">
       <h1 class="page-title">Commercial</h1>
-      <ProjectGrid projects={projects} />
-    </div>
+    </section>
+
+    {projects.length > 0 ? (
+      <section class="tile-stack">
+        {projects.map((project, i) => (
+          <ProjectCard
+            id={project._id}
+            title={project.title}
+            coverImage={project.coverImage}
+            subcategory={project.subcategory}
+            director={project.director}
+            tileVideoUrl={project.tileVideoUrl}
+            index={i}
+          />
+        ))}
+      </section>
+    ) : (
+      <p class="empty">No projects yet.</p>
+    )}
+
+    {projects.map((project) => (
+      <Lightbox project={project} />
+    ))}
   </main>
   <Footer />
+  <LightboxScript />
 </BaseLayout>
 
 <style>
-  .page {
-    padding-top: calc(var(--nav-height) + 64px);
+  .page-header {
+    padding-top: calc(var(--header-total) + var(--space-8));
+    padding-bottom: var(--space-7);
+    text-align: center;
   }
 
   .page-title {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 300;
-    letter-spacing: 0.06em;
+    font-family: var(--font-display);
+    font-size: var(--text-heading);
     text-transform: uppercase;
-    margin-bottom: 48px;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+    color: var(--c-daylight);
+  }
+
+  .tile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--c-slate);
+    padding: var(--space-9) 0;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
   }
 </style>

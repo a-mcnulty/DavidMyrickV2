@@ -20,11 +20,18 @@ export type Project = {
   title: string;
   slug: { current: string };
   category: string;
+  subcategory?: string;
+  director?: string;
   coverImage: SanityImageSource;
-  gallery?: Array<SanityImageSource & { caption?: string }>;
-  vimeoUrl?: string;
+  tileVideoUrl?: string;
+  fullVideoUrl?: string;
   order?: number;
 };
+
+export function extractVimeoId(url: string): string | null {
+  const match = url.match(/vimeo\.com\/(\d+)/);
+  return match ? match[1] : null;
+}
 
 export async function getProjectsByCategory(category: string): Promise<Project[]> {
   return client.fetch(

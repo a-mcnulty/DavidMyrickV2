@@ -1,89 +1,171 @@
 ---
-import { urlFor } from '../lib/sanity';
+import { urlFor, extractVimeoId } from '../lib/sanity';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
 interface Props {
+  id: string;
   title: string;
-  slug: string;
   coverImage: SanityImageSource;
-  hasVideo?: boolean;
+  subcategory?: string;
+  director?: string;
+  tileVideoUrl?: string;
+  index?: number;
 }
 
-const { title, slug, coverImage, hasVideo = false } = Astro.props;
-const imageUrl = urlFor(coverImage).width(800).height(540).format('webp').url();
+const {
+  id,
+  title,
+  coverImage,
+  subcategory,
+  director,
+  tileVideoUrl,
+  index = 1,
+} = Astro.props;
+
+const isFirst = index === 0;
+const tileVimeoId = tileVideoUrl ? extractVimeoId(tileVideoUrl) : null;
+
+const srcSet = [480, 800, 1200, 1800]
+  .map((w) => `${urlFor(coverImage).width(w).format('webp').url()} ${w}w`)
+  .join(', ');
+const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
 ---
 
-<a href={`/project/${slug}`} class="card">
-  <div class="card-image">
+<article
+  class="tile"
+  data-lightbox-trigger={id}
+  data-tile-vimeo={tileVimeoId ?? undefined}
+  role="button"
+  tabindex="0"
+  aria-label={`View ${title}`}
+>
+  {/* Poster image (visible until video loads) */}
+  <div class="tile-frame">
     <img
-      src={imageUrl}
+      class="tile-poster"
+      src={fallbackSrc}
+      srcset={srcSet}
+      sizes="100vw"
       alt={title}
-      loading="lazy"
-      width="800"
-      height="540"
+      loading={isFirst ? 'eager' : 'lazy'}
+      decoding={isFirst ? 'sync' : 'async'}
+      width="1200"
     />
-    {hasVideo && (
-      <div class="play-badge" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <polygon points="5,3 19,12 5,21" />
-        </svg>
-      </div>
+  </div>
+
+  {/* Text overlay */}
+  <div class="tile-overlay">
+    {subcategory && (
+      <span class="tile-subcategory">{subcategory}</span>
+    )}
+    <h2 class="tile-title">{title}</h2>
+    {director && (
+      <span class="tile-director">by {director}</span>
     )}
   </div>
-  <h3 class="card-title">{title}</h3>
-</a>
+</article>
 
 <style>
-  .card {
-    display: block;
-    text-decoration: none;
-    overflow: hidden;
-  }
-
-  .card-image {
+  .tile {
     position: relative;
     overflow: hidden;
-    border-radius: 4px;
-    aspect-ratio: 800 / 540;
-    background: var(--color-surface);
+    cursor: pointer;
+    outline: none;
   }
 
-  .card-image img {
+  .tile:focus-visible {
+    outline: 2px solid var(--c-tungsten);
+    outline-offset: 2px;
+  }
+
+  /* --- Frame: responsive aspect ratio --- */
+
+  .tile-frame {
+    aspect-ratio: var(--ratio-viewfinder);
+    overflow: hidden;
+    background: var(--c-negative);
+  }
+
+  @media (min-width: 640px) {
+    .tile-frame {
+      aspect-ratio: var(--ratio-wide);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .tile-frame {
+      aspect-ratio: var(--ratio-cinematic);
+    }
+  }
+
+  .tile-poster {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    transition: opacity var(--duration-lg) var(--ease-out);
   }
 
-  .card:hover .card-image img {
-    transform: scale(1.04);
-    opacity: 0.8;
+  /* Hide poster once video iframe is injected */
+  .tile.has-video .tile-poster {
+    opacity: 0;
   }
 
-  .play-badge {
+  /* Vimeo background iframe (injected by JS) */
+  .tile :global(iframe.tile-video) {
     position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 50%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    pointer-events: none;
+  }
+
+  /* --- Text overlay --- */
+
+  .tile-overlay {
+    position: absolute;
+    inset: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: white;
-    backdrop-filter: blur(4px);
+    text-align: center;
+    padding: var(--space-5);
+    pointer-events: none;
+    transition: opacity var(--duration-md) var(--ease-out);
   }
 
-  .card-title {
-    font-size: 0.9rem;
-    font-weight: 400;
-    margin-top: 10px;
-    color: var(--color-text-muted);
-    letter-spacing: 0.02em;
+  .tile:hover .tile-overlay {
+    opacity: 0.6;
   }
 
-  .card:hover .card-title {
-    color: var(--color-text);
+  .tile-subcategory {
+    font-family: var(--font-utility);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-utility);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-daylight);
+    opacity: 0.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .tile-title {
+    font-family: var(--font-display);
+    font-size: var(--text-tile);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+    color: var(--c-daylight);
+  }
+
+  .tile-director {
+    font-family: var(--font-body);
+    font-weight: var(--weight-regular);
+    font-size: var(--text-small);
+    color: var(--c-daylight);
+    opacity: 0.7;
+    margin-top: var(--space-2);
+    letter-spacing: var(--tracking-normal);
   }
 </style>
