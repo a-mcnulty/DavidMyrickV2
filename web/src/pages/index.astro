@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getAllProjects } from '../lib/sanity';
+
+const projects = await getAllProjects();
+const featured = projects.slice(0, 6);
+---
+
+<BaseLayout>
+  <Header />
+
+  <main class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">David J Myrick</h1>
+        <p class="hero-subtitle">Director of Photography</p>
+      </div>
+
+      {featured.length > 0 && (
+        <section class="featured">
+          <div class="featured-grid">
+            {featured.map((project) => (
+              <ProjectCard
+                title={project.title}
+                slug={project.slug.current}
+                coverImage={project.coverImage}
+                hasVideo={!!project.vimeoUrl}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-top: calc(var(--nav-height) + 80px);
+  }
+
+  .hero-content {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: var(--color-text-muted);
+    margin-top: 16px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 32px;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding-top: calc(var(--nav-height) + 48px);
+    }
+
+    .hero-content {
+      margin-bottom: 48px;
+    }
+
+    .featured-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+</style>

@@ -1,0 +1,187 @@
+/* ==========================================================================
+   DESIGN TOKENS
+   All values derived from the approved design direction ("The Reel").
+   Breakpoints (for reference — can't use custom props in @media):
+     --bp-mobile:   < 640px
+     --bp-tablet:   640px – 1023px
+     --bp-desktop:  1024px+
+   ========================================================================== */
+
+:root {
+  /* --- Color --- */
+  --c-darkroom:  #0d0b0a;   /* Primary background — warm near-black            */
+  --c-negative:  #1a1816;   /* Surface, dividers, modal bg                     */
+  --c-slate:     #636870;   /* Secondary text, UI chrome — cool ambient side   */
+  --c-daylight:  #e8e4df;   /* Primary text — warm off-white                   */
+  --c-tungsten:  #c4a46a;   /* Accent — warm practical light, used sparingly   */
+
+  /* --- Typography – Families --- */
+  --font-display:  'Bebas Neue', sans-serif;          /* Titles, hero, tile overlay  */
+  --font-body:     'Barlow', system-ui, sans-serif;   /* Bio, captions, form fields  */
+  --font-utility:  'Barlow Condensed', sans-serif;    /* Nav labels, category tags   */
+
+  /* --- Typography – Scale (display: fluid, body/utility: fixed) --- */
+  --text-hero:     clamp(2.4rem, 6vw, 5rem);     /* Hero name                   */
+  --text-tile:     clamp(1.8rem, 5vw, 4rem);      /* Project title on tile        */
+  --text-heading:  clamp(1.6rem, 4vw, 3rem);      /* Section page heading         */
+  --text-subhead:  clamp(1.1rem, 2vw, 1.35rem);   /* Subtitle / tagline           */
+  --text-body:     1rem;                           /* 16px, fixed at all bp        */
+  --text-small:    0.875rem;                       /* 14px, credits / captions     */
+  --text-utility:  0.75rem;                        /* 12px, category tags / nav #s */
+
+  /* --- Typography – Weights --- */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+
+  /* --- Typography – Tracking --- */
+  --tracking-tight:   0.02em;   /* Body text                     */
+  --tracking-normal:  0.04em;   /* Nav labels, credits           */
+  --tracking-wide:    0.08em;   /* Utility labels, category tags */
+  --tracking-display: 0.06em;   /* Display / hero type           */
+
+  /* --- Spacing (4px base grid) --- */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   24px;
+  --space-6:   32px;
+  --space-7:   48px;
+  --space-8:   64px;
+  --space-9:   80px;
+  --space-10: 120px;
+
+  /* --- Layout --- */
+  --max-width:    1400px;
+  --nav-height:   72px;
+  --tap-min:      48px;    /* Minimum touch target (WCAG / Apple HIG) */
+
+  /* --- Tile Aspect Ratios (shift per breakpoint via class) --- */
+  --ratio-cinematic: 2.39 / 1;   /* Desktop: anamorphic widescreen  */
+  --ratio-wide:      16 / 9;     /* Tablet: standard widescreen     */
+  --ratio-viewfinder: 4 / 3;     /* Mobile: held-camera proportion  */
+
+  /* --- Motion --- */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-sm: 0.2s;
+  --duration-md: 0.3s;
+  --duration-lg: 0.5s;
+}
+
+
+/* ==========================================================================
+   RESET
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  background-color: var(--c-darkroom);
+  color: var(--c-daylight);
+  line-height: 1.6;
+  min-height: 100dvh;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
+
+/* ==========================================================================
+   LAYOUT UTILITIES
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 var(--space-5);
+  }
+}
+
+.full-bleed {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+
+/* ==========================================================================
+   TYPOGRAPHY UTILITIES
+   ========================================================================== */
+
+.text-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.05;
+}
+
+.text-utility {
+  font-family: var(--font-utility);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  font-size: var(--text-utility);
+}
+
+.text-muted {
+  color: var(--c-slate);
+}
+
+
+/* ==========================================================================
+   TILE ASPECT RATIO (mobile-first: 4:3 → 16:9 → 2.39:1)
+   ========================================================================== */
+
+.tile-frame {
+  aspect-ratio: var(--ratio-viewfinder);
+}
+
+@media (min-width: 640px) {
+  .tile-frame {
+    aspect-ratio: var(--ratio-wide);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tile-frame {
+    aspect-ratio: var(--ratio-cinematic);
+  }
+}

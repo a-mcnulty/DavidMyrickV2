@@ -1,0 +1,89 @@
+---
+import { urlFor } from '../lib/sanity';
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+
+interface Props {
+  title: string;
+  slug: string;
+  coverImage: SanityImageSource;
+  hasVideo?: boolean;
+}
+
+const { title, slug, coverImage, hasVideo = false } = Astro.props;
+const imageUrl = urlFor(coverImage).width(800).height(540).format('webp').url();
+---
+
+<a href={`/project/${slug}`} class="card">
+  <div class="card-image">
+    <img
+      src={imageUrl}
+      alt={title}
+      loading="lazy"
+      width="800"
+      height="540"
+    />
+    {hasVideo && (
+      <div class="play-badge" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5,3 19,12 5,21" />
+        </svg>
+      </div>
+    )}
+  </div>
+  <h3 class="card-title">{title}</h3>
+</a>
+
+<style>
+  .card {
+    display: block;
+    text-decoration: none;
+    overflow: hidden;
+  }
+
+  .card-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    aspect-ratio: 800 / 540;
+    background: var(--color-surface);
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  .card:hover .card-image img {
+    transform: scale(1.04);
+    opacity: 0.8;
+  }
+
+  .play-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    backdrop-filter: blur(4px);
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin-top: 10px;
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .card:hover .card-title {
+    color: var(--color-text);
+  }
+</style>
