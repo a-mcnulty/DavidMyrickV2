@@ -21,6 +21,9 @@
   --c-overlay:        rgba(0, 0, 0, 0.5);
   --c-overlay-hover:  rgba(0, 0, 0, 0.7);
 
+  /* Theme toggle transition */
+  --theme-transition: background-color 0.3s ease, color 0.3s ease;
+
   /* --- Typography – Families --- */
   --font-display:  'Bebas Neue', sans-serif;          /* Titles, hero, tile overlay  */
   --font-body:     'Barlow', system-ui, sans-serif;   /* Bio, captions, form fields  */
@@ -80,6 +83,24 @@
 
 
 /* ==========================================================================
+   LIGHT THEME
+   ========================================================================== */
+
+[data-theme="light"] {
+  --c-darkroom:  #f2efe9;
+  --c-negative:  #e5e1da;
+  --c-slate:     #7a7d85;
+  --c-daylight:  #1a1816;
+  --c-tungsten:  #9a7d3f;
+
+  --c-glass:          color-mix(in srgb, #f2efe9 92%, transparent);
+  --c-backdrop:       rgba(255, 255, 255, 0.95);
+  --c-overlay:        rgba(255, 255, 255, 0.5);
+  --c-overlay-hover:  rgba(255, 255, 255, 0.7);
+}
+
+
+/* ==========================================================================
    RESET
    ========================================================================== */
 
@@ -105,6 +126,7 @@ body {
   color: var(--c-daylight);
   line-height: 1.6;
   min-height: 100dvh;
+  transition: var(--theme-transition);
 }
 
 @media (min-width: 1024px) {

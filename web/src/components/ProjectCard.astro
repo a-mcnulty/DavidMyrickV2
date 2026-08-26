@@ -156,9 +156,10 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
     font-size: var(--text-utility);
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
-    color: var(--c-daylight);
+    color: #e8e4df;
     opacity: 0.8;
     margin-bottom: var(--space-2);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   }
 
   .tile-title {
@@ -167,16 +168,22 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
     text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     line-height: 1.05;
-    color: var(--c-daylight);
+    color: #e8e4df;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    padding: var(--space-2) var(--space-4);
+    border-radius: 2px;
   }
 
   .tile-director {
     font-family: var(--font-body);
     font-weight: var(--weight-regular);
     font-size: var(--text-small);
-    color: var(--c-daylight);
+    color: #e8e4df;
     opacity: 0.7;
     margin-top: var(--space-2);
     letter-spacing: var(--tracking-normal);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   }
 </style>
