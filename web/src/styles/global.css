@@ -14,6 +14,7 @@
   --c-slate:     #636870;   /* Secondary text, UI chrome — cool ambient side   */
   --c-daylight:  #e8e4df;   /* Primary text — warm off-white                   */
   --c-tungsten:  #c4a46a;   /* Accent — warm practical light, used sparingly   */
+  --c-tally:     #e63226;   /* Active/hover indicator — bright red tally light  */
 
   /* Derived / semi-transparent */
   --c-glass:          color-mix(in srgb, var(--c-darkroom) 92%, transparent);
