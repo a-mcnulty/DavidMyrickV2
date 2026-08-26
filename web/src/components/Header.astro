@@ -1,10 +1,9 @@
 ---
 const navItems = [
-  { num: '01', label: 'Photography', href: '/photography' },
-  { num: '02', label: 'Music Video', href: '/music-video' },
-  { num: '03', label: 'Commercial', href: '/commercial' },
-  { num: '04', label: 'Narrative', href: '/narrative' },
-  { num: '05', label: "Let's Talk", href: '/lets-talk' },
+  { num: '01', label: 'Music Video', href: '/music-video' },
+  { num: '02', label: 'Commercial', href: '/commercial' },
+  { num: '03', label: 'Narrative', href: '/narrative' },
+  { num: '04', label: "Let's Talk", href: '/lets-talk' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -324,7 +323,7 @@ function isActive(href: string): boolean {
 
   .nav-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     list-style: none;
   }
 

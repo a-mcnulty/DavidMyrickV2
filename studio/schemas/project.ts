@@ -26,7 +26,6 @@ export default defineType({
       description: 'Which section of the site should this appear in?',
       options: {
         list: [
-          { title: 'Photography', value: 'photography' },
           { title: 'Music Video', value: 'music-video' },
           { title: 'Commercial', value: 'commercial' },
           { title: 'Narrative', value: 'narrative' },
