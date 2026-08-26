@@ -5,4 +5,5 @@ export default defineCliConfig({
     projectId: 'cd3com2c',
     dataset: 'production',
   },
+  studioHost: 'davidmyrick',
 })

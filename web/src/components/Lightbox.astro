@@ -8,6 +8,7 @@ interface Props {
 
 const { project } = Astro.props;
 const fullVimeoId = project.fullVideoUrl ? extractVimeoId(project.fullVideoUrl) : null;
+const dims = project.fullVideoDimensions;
 ---
 
 {fullVimeoId && (
@@ -42,7 +43,11 @@ const fullVimeoId = project.fullVideoUrl ? extractVimeoId(project.fullVideoUrl) 
 
     <div class="lightbox-content">
       <div class="lightbox-player">
-        <div class="player-wrapper" data-full-vimeo-id={fullVimeoId}>
+        <div
+          class="player-wrapper"
+          data-full-vimeo-id={fullVimeoId}
+          style={dims ? `aspect-ratio: ${dims.width} / ${dims.height}` : undefined}
+        >
           {/* Iframe injected on open by LightboxScript */}
         </div>
       </div>
@@ -133,26 +138,18 @@ const fullVimeoId = project.fullVideoUrl ? extractVimeoId(project.fullVideoUrl) 
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 var(--space-4) var(--space-8);
-  }
-
-  @media (min-width: 640px) {
-    .lightbox-content {
-      padding: 0 var(--space-7) var(--space-8);
-    }
+    padding: 0;
   }
 
   .lightbox-player {
     width: 100%;
-    max-width: var(--max-width-content);
   }
 
   .player-wrapper {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: var(--c-negative);
+    background: var(--c-darkroom);
     overflow: hidden;
   }
 

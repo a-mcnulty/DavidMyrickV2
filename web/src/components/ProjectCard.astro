@@ -1,6 +1,7 @@
 ---
 import { urlFor, extractVimeoId } from '../lib/sanity';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import type { VimeoDimensions } from '../lib/sanity';
 
 interface Props {
   id: string;
@@ -9,6 +10,7 @@ interface Props {
   subcategory?: string;
   director?: string;
   tileVideoUrl?: string;
+  tileVideoDimensions?: VimeoDimensions;
   index?: number;
 }
 
@@ -19,6 +21,7 @@ const {
   subcategory,
   director,
   tileVideoUrl,
+  tileVideoDimensions,
   index = 1,
 } = Astro.props;
 
@@ -38,6 +41,7 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
   role="button"
   tabindex="0"
   aria-label={`View ${title}`}
+  style={tileVideoDimensions ? `--tile-vw: ${tileVideoDimensions.width}; --tile-vh: ${tileVideoDimensions.height}` : undefined}
 >
   {/* Poster image (visible until video loads) */}
   <div class="tile-frame">
@@ -81,6 +85,7 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
   /* --- Frame: responsive aspect ratio --- */
 
   .tile-frame {
+    position: relative;
     aspect-ratio: var(--ratio-viewfinder);
     overflow: hidden;
     background: var(--c-negative);
@@ -102,6 +107,7 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: opacity var(--duration-lg) var(--ease-out);
   }
 
@@ -110,12 +116,17 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
     opacity: 0;
   }
 
-  /* Vimeo background iframe (injected by JS) */
+  /* Vimeo background iframe — maintains native ratio, overflows + centers in crop frame */
   .tile :global(iframe.tile-video) {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    aspect-ratio: var(--tile-vw, 16) / var(--tile-vh, 9);
     border: 0;
     pointer-events: none;
   }
