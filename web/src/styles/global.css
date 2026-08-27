@@ -130,11 +130,6 @@ body {
   transition: var(--theme-transition);
 }
 
-@media (min-width: 1024px) {
-  :root {
-    --header-total: calc(var(--nav-height) + var(--nav-grid-height));
-  }
-}
 
 img {
   display: block;

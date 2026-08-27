@@ -9,42 +9,16 @@ import { getAllProjects } from '../lib/sanity';
 
 const projects = await getAllProjects();
 
-const categories = [
-  { value: 'all', label: 'All' },
-  { value: 'narrative', label: 'Narrative' },
-  { value: 'commercial', label: 'Commercial' },
-  { value: 'music-video', label: 'Music Video' },
-];
 ---
 
 <BaseLayout>
   <Header />
 
   <main>
-    {/* ===== Hero ===== */}
-    <section class="hero">
-      <h1 class="hero-name">David J Myrick</h1>
-      <p class="hero-role">Director of Photography</p>
-    </section>
-
-    {/* ===== Filter bar ===== */}
-    <div class="filter-bar">
-      <div class="filter-inner container">
-        {categories.map(({ value, label }) => (
-          <button
-            class:list={['filter-btn', { active: value === 'all' }]}
-            data-filter={value}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-    </div>
-
     {/* ===== Project tiles ===== */}
     <section class="tile-stack">
       {projects.map((project, i) => (
-        <div class="tile-item" data-category={project.category}>
+        <div class="tile-item">
           <ProjectCard
             id={project._id}
             title={project.title}
@@ -59,8 +33,6 @@ const categories = [
       ))}
     </section>
 
-    <p class="empty-state">No projects in this category yet.</p>
-
     {/* ===== Lightboxes (one per project, hidden) ===== */}
     {projects.map((project) => (
       <Lightbox project={project} />
@@ -71,113 +43,7 @@ const categories = [
   <LightboxScript />
 </BaseLayout>
 
-<script>
-  function initFilters() {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-    const tiles = document.querySelectorAll<HTMLElement>('[data-category]');
-    const empty = document.querySelector<HTMLElement>('.empty-state');
-
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter!;
-
-        buttons.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        let visibleCount = 0;
-        tiles.forEach((tile) => {
-          const show = filter === 'all' || tile.dataset.category === filter;
-          tile.style.display = show ? '' : 'none';
-          if (show) visibleCount++;
-        });
-
-        if (empty) {
-          empty.style.display = visibleCount === 0 ? '' : 'none';
-        }
-      });
-    });
-
-    if (empty) empty.style.display = 'none';
-  }
-
-  initFilters();
-  document.addEventListener('astro:after-swap', initFilters);
-</script>
-
 <style>
-  /* ===== Hero ===== */
-
-  .hero {
-    padding-top: calc(var(--header-total) + var(--space-9));
-    padding-bottom: var(--space-9);
-    text-align: center;
-  }
-
-  .hero-name {
-    font-family: var(--font-display);
-    font-size: var(--text-hero);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-display);
-    line-height: 1.05;
-    color: var(--c-daylight);
-  }
-
-  .hero-role {
-    font-family: var(--font-utility);
-    font-size: var(--text-subhead);
-    font-weight: var(--weight-medium);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-    color: var(--c-slate);
-    margin-top: var(--space-4);
-  }
-
-  /* ===== Filter bar ===== */
-
-  .filter-bar {
-    border-top: 1px solid var(--c-negative);
-    border-bottom: 1px solid var(--c-negative);
-    margin-bottom: var(--space-1);
-  }
-
-  .filter-inner {
-    display: flex;
-    gap: var(--space-2);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-top: var(--space-3);
-    padding-bottom: var(--space-3);
-  }
-
-  .filter-inner::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filter-btn {
-    font-family: var(--font-utility);
-    font-weight: var(--weight-medium);
-    font-size: var(--text-utility);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-    color: var(--c-slate);
-    padding: var(--space-2) var(--space-4);
-    min-height: var(--tap-min);
-    white-space: nowrap;
-    border-radius: 2px;
-    transition: color var(--duration-sm) var(--ease-out),
-                background var(--duration-sm) var(--ease-out);
-  }
-
-  .filter-btn:hover {
-    color: var(--c-daylight);
-  }
-
-  .filter-btn.active {
-    color: var(--c-daylight);
-    background: var(--c-negative);
-  }
-
   /* ===== Tile stack ===== */
 
   .tile-stack {
@@ -186,14 +52,4 @@ const categories = [
     gap: 2px;
   }
 
-  /* ===== Empty state ===== */
-
-  .empty-state {
-    text-align: center;
-    color: var(--c-slate);
-    padding: var(--space-9) 0;
-    font-family: var(--font-body);
-    font-size: var(--text-body);
-    display: none;
-  }
 </style>

@@ -47,8 +47,8 @@ function isActive(href: string): boolean {
           href={href}
           class:list={['nav-tablet-link', { active: isActive(href) }]}
         >
+          <span class="tablet-label">{label}</span>
           <span class="tablet-dot" aria-hidden="true"></span>
-          {label}
         </a>
       ))}
     </nav>
@@ -74,6 +74,12 @@ function isActive(href: string): boolean {
 
   <!-- Mobile: full-screen overlay -->
   <nav class="nav-overlay" aria-label="Main navigation">
+    <button class="overlay-close" data-overlay-close aria-label="Close menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="5" y1="5" x2="19" y2="19" />
+        <line x1="19" y1="5" x2="5" y2="19" />
+      </svg>
+    </button>
     <ul class="overlay-list">
       {navItems.map(({ num, label, href }) => (
         <li>
@@ -123,6 +129,12 @@ function isActive(href: string): boolean {
       document.body.style.overflow = '';
     });
   });
+
+  document.querySelector('.overlay-close')?.addEventListener('click', () => {
+    toggle?.setAttribute('aria-expanded', 'false');
+    overlay?.classList.remove('open');
+    document.body.style.overflow = '';
+  });
 </script>
 
 <style>
@@ -139,9 +151,8 @@ function isActive(href: string): boolean {
     justify-content: space-between;
     height: var(--nav-height);
     padding: 0 var(--space-4);
-    background: var(--c-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   @media (min-width: 640px) {
@@ -185,7 +196,7 @@ function isActive(href: string): boolean {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-  }
+      }
 
   .logo-dot {
     width: 8px;
@@ -247,11 +258,13 @@ function isActive(href: string): boolean {
     display: none;
   }
 
-  @media (min-width: 640px) and (max-width: 1023px) {
+  @media (min-width: 640px) {
     .nav-tablet {
       display: flex;
-      gap: var(--space-5);
-      align-items: center;
+      align-items: stretch;
+      gap: 0;
+      border-top: 1px solid var(--c-negative);
+      border-bottom: 1px solid var(--c-negative);
     }
   }
 
@@ -261,14 +274,36 @@ function isActive(href: string): boolean {
     font-size: var(--text-utility);
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
-    color: var(--c-slate);
-    padding: var(--space-3) var(--space-2);
-    min-height: var(--tap-min);
+    color: var(--c-daylight);
+    padding: var(--space-3) var(--space-4);
     display: flex;
-    align-items: center;
-    gap: var(--space-2);
+    flex-direction: column;
+    gap: var(--space-1);
     white-space: nowrap;
-    transition: color var(--duration-sm) var(--ease-out);
+    border-left: 1px solid var(--c-negative);
+    border-right: 1px solid var(--c-negative);
+    margin-left: -1px;
+    transition: color var(--duration-sm) var(--ease-out),
+                background var(--duration-sm) var(--ease-out);
+  }
+
+  .nav-tablet-link:first-child {
+    margin-left: 0;
+  }
+
+  .nav-tablet-link:hover {
+    color: var(--c-daylight);
+    background: var(--c-negative);
+  }
+
+  .nav-tablet-link.active {
+    color: var(--c-daylight);
+  }
+
+  .tablet-label {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-utility);
+        transition: color var(--duration-sm) var(--ease-out);
   }
 
   .tablet-dot {
@@ -276,19 +311,12 @@ function isActive(href: string): boolean {
     height: 6px;
     background: var(--c-slate);
     flex-shrink: 0;
+    margin-top: var(--space-1);
     transition: background var(--duration-sm) var(--ease-out);
-  }
-
-  .nav-tablet-link:hover {
-    color: var(--c-daylight);
   }
 
   .nav-tablet-link:hover .tablet-dot {
     background: var(--c-tally);
-  }
-
-  .nav-tablet-link.active {
-    color: var(--c-daylight);
   }
 
   .nav-tablet-link.active .tablet-dot {
@@ -301,24 +329,8 @@ function isActive(href: string): boolean {
     display: none;
   }
 
-  @media (min-width: 1024px) {
-    .header-bar {
-      border-bottom: none;
-    }
-
-    .nav-desktop {
-      display: block;
-      position: fixed;
-      top: var(--nav-height);
-      left: 0;
-      right: 0;
-      z-index: 190;
-      background: var(--c-glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-top: 1px solid var(--c-negative);
-      border-bottom: 1px solid var(--c-negative);
-    }
+  .nav-desktop {
+    display: none;
   }
 
   .nav-grid {
@@ -417,22 +429,48 @@ function isActive(href: string): boolean {
     }
   }
 
+  .overlay-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    color: var(--c-slate);
+    transition: color var(--duration-sm) var(--ease-out);
+  }
+
+  .overlay-close:hover {
+    color: var(--c-daylight);
+  }
+
   .overlay-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--space-7);
+    width: 100%;
+    max-width: 320px;
+    border-top: 1px solid var(--c-negative);
+  }
+
+  .overlay-list li {
+    border-bottom: 1px solid var(--c-negative);
+    border-left: 1px solid var(--c-negative);
+    border-right: 1px solid var(--c-negative);
   }
 
   .overlay-link {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: var(--space-2);
-    min-height: var(--tap-min);
-    justify-content: center;
-    padding: var(--space-2) var(--space-6);
+    padding: var(--space-5) var(--space-5);
+    transition: background var(--duration-sm) var(--ease-out);
+  }
+
+  .overlay-link:hover {
+    background: var(--c-negative);
   }
 
   .overlay-num {
