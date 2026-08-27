@@ -35,7 +35,7 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
 ---
 
 <article
-  class="tile"
+  class:list={['tile', { 'is-first': isFirst }]}
   data-lightbox-trigger={id}
   data-tile-vimeo={tileVimeoId ?? undefined}
   role="button"
@@ -101,6 +101,29 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
     .tile-frame {
       aspect-ratio: var(--ratio-cinematic);
     }
+  }
+
+  /* First tile: squarer ratio */
+  .is-first .tile-frame {
+    aspect-ratio: 4 / 3;
+  }
+
+  @media (min-width: 640px) {
+    .is-first .tile-frame {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .is-first .tile-frame {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
+  /* First tile: offset text below nav */
+  .is-first .tile-overlay {
+    padding-bottom: calc(var(--header-total) + var(--space-5));
+    justify-content: flex-end;
   }
 
   .tile-poster {
