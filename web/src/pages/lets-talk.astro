@@ -2,25 +2,53 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ContactForm from '../components/ContactForm.astro';
-
-const success = Astro.url.searchParams.get('success') === 'true';
 ---
 
 <BaseLayout title="Let's Talk — David J Myrick">
   <Header />
   <main class="page">
-    <div class="container">
-      <h1 class="page-title">Let's Talk</h1>
-      <p class="page-intro">Have a project in mind? I'd love to hear about it.</p>
+    <div class="content">
+      <h1 class="page-heading">Let's Talk</h1>
 
-      {success ? (
-        <div class="success-msg">
-          <p>Thanks for reaching out! I'll get back to you soon.</p>
+      <section class="profile">
+        <h2 class="profile-name">David J. Myrick</h2>
+        <p class="profile-detail">Located In California.</p>
+        <p class="profile-detail">IATSE Local 600 Member</p>
+
+        <div class="social-links">
+          <a href="https://www.instagram.com/davidmyrick" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://www.imdb.com/name/nm1234567/" target="_blank" rel="noopener noreferrer">IMDb</a>
+          <a href="https://vimeo.com/davidmyrick" target="_blank" rel="noopener noreferrer">Vimeo</a>
         </div>
-      ) : (
-        <ContactForm />
-      )}
+      </section>
+
+      <section class="bio">
+        <p>"Raised in California, grew up in a camera shop that was owned and operated by a father who had a passion for fine art photography. Visited the darkrooms of some of the greatest B&W photographers of this decade, including Ansel Adams & Edward Weston. Set out to make a career in film making with only a wild idea of this becoming a reality. Always approaching every job as an opportunity and an emotion on how to become better at what I set out to do."</p>
+      </section>
+
+      <section class="agency">
+        <div class="agency-header">
+          <h3 class="agency-label">Agency</h3>
+          <p class="agency-name">United Talent Agency</p>
+          <p class="agency-address">9336 Civic Center Drive</p>
+          <p class="agency-address">Beverly Hills, CA 90210</p>
+          <p class="agency-phone">t: 310-228-3839</p>
+        </div>
+
+        <div class="contacts">
+          <div class="contact-block">
+            <h4 class="contact-type">Features</h4>
+            <p class="contact-name">Eli Idunate</p>
+            <a href="mailto:eli.idunate@unitedtalent.com" class="contact-email">eli.idunate@unitedtalent.com</a>
+          </div>
+
+          <div class="contact-block">
+            <h4 class="contact-type">Commercials & Music Video</h4>
+            <p class="contact-name">Melody Sandoval</p>
+            <a href="mailto:melody.sandoval@unitedtalent.com" class="contact-email">melody.sandoval@unitedtalent.com</a>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
   <Footer />
@@ -28,32 +56,170 @@ const success = Astro.url.searchParams.get('success') === 'true';
 
 <style>
   .page {
-    padding-top: calc(var(--nav-height) + 64px);
+    padding-top: calc(var(--header-total) + var(--space-8));
+    padding-bottom: var(--space-10);
+    min-height: 100vh;
   }
 
-  .page-title {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 300;
-    letter-spacing: 0.06em;
+  .content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .content {
+      padding: 0 var(--space-5);
+    }
+  }
+
+  .page-heading {
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
     text-transform: uppercase;
-    margin-bottom: 16px;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+    color: var(--c-daylight);
+    margin-bottom: var(--space-9);
   }
 
-  .page-intro {
-    color: var(--color-text-muted);
-    font-size: 1.05rem;
-    margin-bottom: 48px;
+  /* --- Profile --- */
+
+  .profile {
+    margin-bottom: var(--space-8);
   }
 
-  .success-msg {
-    padding: 24px;
-    background: var(--color-surface);
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    max-width: 560px;
+  .profile-name {
+    font-family: var(--font-display);
+    font-size: var(--text-heading);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.1;
+    color: var(--c-daylight);
+    margin-bottom: var(--space-3);
   }
 
-  .success-msg p {
-    color: var(--color-accent);
+  .profile-detail {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--c-slate);
+    line-height: 1.6;
+  }
+
+  .social-links {
+    display: flex;
+    gap: var(--space-5);
+    margin-top: var(--space-4);
+  }
+
+  .social-links a {
+    font-family: var(--font-utility);
+    font-size: var(--text-utility);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-slate);
+    transition: color var(--duration-sm) var(--ease-out);
+  }
+
+  .social-links a:hover {
+    color: var(--c-daylight);
+  }
+
+  /* --- Bio --- */
+
+  .bio {
+    margin-bottom: var(--space-9);
+    border-top: 1px solid var(--c-daylight);
+    padding-top: var(--space-7);
+  }
+
+  .bio p {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--c-daylight);
+    line-height: 1.8;
+    font-style: italic;
+  }
+
+  /* --- Agency --- */
+
+  .agency {
+    border-top: 1px solid var(--c-daylight);
+    padding-top: var(--space-7);
+  }
+
+  .agency-label {
+    font-family: var(--font-utility);
+    font-size: var(--text-utility);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-slate);
+    margin-bottom: var(--space-3);
+  }
+
+  .agency-name {
+    font-family: var(--font-display);
+    font-size: var(--text-subhead);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--c-daylight);
+    margin-bottom: var(--space-2);
+  }
+
+  .agency-address,
+  .agency-phone {
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    color: var(--c-slate);
+    line-height: 1.6;
+  }
+
+  .agency-phone {
+    margin-top: var(--space-2);
+  }
+
+  .contacts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    margin-top: var(--space-7);
+  }
+
+  @media (min-width: 640px) {
+    .contacts {
+      flex-direction: row;
+      gap: var(--space-9);
+    }
+  }
+
+  .contact-block {
+    flex: 1;
+  }
+
+  .contact-type {
+    font-family: var(--font-utility);
+    font-size: var(--text-utility);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-slate);
+    margin-bottom: var(--space-2);
+  }
+
+  .contact-name {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--c-daylight);
+    margin-bottom: var(--space-1);
+  }
+
+  .contact-email {
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    color: var(--c-tungsten);
+    transition: color var(--duration-sm) var(--ease-out);
+  }
+
+  .contact-email:hover {
+    color: var(--c-daylight);
   }
 </style>

@@ -1,4 +1,7 @@
 ---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
 interface Props {
   title?: string;
 }
@@ -13,22 +16,16 @@ const { title = 'David J Myrick — Director of Photography' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="David J Myrick — Director of Photography. Photography, music videos, commercials, and narrative work." />
 
-    <!-- Font loading: preconnect + display=swap for non-blocking render -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500&family=Barlow+Condensed:wght@500;600&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preload" href="/fonts/bebas-neue-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-condensed-500.woff2" as="font" type="font/woff2" crossorigin />
 
     <script is:inline>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark')</script>
+    <ClientRouter />
     <title>{title}</title>
   </head>
   <body>
     <slot />
   </body>
 </html>
-
-<style is:global>
-  @import '../styles/global.css';
-</style>

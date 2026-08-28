@@ -15,7 +15,13 @@ function isActive(href: string): boolean {
 
 <header class="header">
   <div class="header-bar">
-    <a href="/" class:list={['logo', { active: currentPath === '/' }]}><span class="logo-dot" aria-hidden="true"></span>David J Myrick</a>
+    <a href="/" class:list={['logo', { active: currentPath === '/' }]}>
+      <span class="logo-dot" aria-hidden="true"></span>
+      <span class="logo-text">
+        <span class="logo-name">David J Myrick</span>
+        <span class="logo-role">Director of Photography</span>
+      </span>
+    </a>
 
     <button class="theme-toggle" aria-label="Toggle light/dark mode">
       <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
@@ -100,41 +106,44 @@ function isActive(href: string): boolean {
 </header>
 
 <script>
-  const themeBtn = document.querySelector('.theme-toggle');
-  function applyTheme(theme: string) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }
-  const saved = localStorage.getItem('theme') || 'dark';
-  applyTheme(saved);
-  themeBtn?.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    applyTheme(current === 'dark' ? 'light' : 'dark');
-  });
+  function initHeader() {
+    function applyTheme(theme: string) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
 
-  const toggle = document.querySelector('.menu-toggle');
-  const overlay = document.querySelector('.nav-overlay');
+    const themeBtn = document.querySelector('.theme-toggle');
+    themeBtn?.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
 
-  toggle?.addEventListener('click', () => {
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!expanded));
-    overlay?.classList.toggle('open');
-    document.body.style.overflow = expanded ? '' : 'hidden';
-  });
+    const toggle = document.querySelector('.menu-toggle');
+    const overlay = document.querySelector('.nav-overlay');
 
-  overlay?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
+    toggle?.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      overlay?.classList.toggle('open');
+      document.body.style.overflow = expanded ? '' : 'hidden';
+    });
+
+    overlay?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        toggle?.setAttribute('aria-expanded', 'false');
+        overlay?.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    document.querySelector('.overlay-close')?.addEventListener('click', () => {
       toggle?.setAttribute('aria-expanded', 'false');
       overlay?.classList.remove('open');
       document.body.style.overflow = '';
     });
-  });
+  }
 
-  document.querySelector('.overlay-close')?.addEventListener('click', () => {
-    toggle?.setAttribute('aria-expanded', 'false');
-    overlay?.classList.remove('open');
-    document.body.style.overflow = '';
-  });
+  document.addEventListener('astro:page-load', initHeader);
 </script>
 
 <style>
@@ -151,8 +160,41 @@ function isActive(href: string): boolean {
     justify-content: space-between;
     height: var(--nav-height);
     padding: 0 var(--space-4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .header-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    bottom: -40px;
+    z-index: -1;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.3) 30%,
+      rgba(0, 0, 0, 0.15) 55%,
+      rgba(0, 0, 0, 0.05) 75%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    mask-image: linear-gradient(to bottom, black 40%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
+    pointer-events: none;
+  }
+
+  :global([data-theme="light"]) .header-bar::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.3) 30%,
+      rgba(255, 255, 255, 0.15) 55%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
   }
 
   @media (min-width: 640px) {
@@ -182,17 +224,44 @@ function isActive(href: string): boolean {
   :global([data-theme="light"]) .icon-moon { display: block; }
 
   .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--c-daylight);
+    white-space: nowrap;
+  }
+
+  .logo.active {
+    color: var(--c-signal);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-name {
     font-family: var(--font-display);
     font-size: clamp(1.1rem, 2.5vw, 1.4rem);
     text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     line-height: 1;
-    color: var(--c-daylight);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-      }
+  }
+
+  .logo-role {
+    font-family: var(--font-utility);
+    font-size: clamp(0.55rem, 1.2vw, 0.7rem);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-slate);
+    line-height: 1;
+    margin-top: 3px;
+  }
+
+  .logo.active .logo-role {
+    color: var(--c-signal);
+    opacity: 0.7;
+  }
 
   .logo-dot {
     width: 8px;
@@ -293,7 +362,7 @@ function isActive(href: string): boolean {
   }
 
   .nav-tablet-link.active {
-    color: var(--c-daylight);
+    color: var(--c-signal);
   }
 
   .tablet-label {
@@ -390,7 +459,7 @@ function isActive(href: string): boolean {
 
   .nav-cell.active .nav-num,
   .nav-cell.active .nav-label {
-    color: var(--c-daylight);
+    color: var(--c-signal);
   }
 
   .nav-cell.active .nav-dot {
@@ -403,8 +472,14 @@ function isActive(href: string): boolean {
     position: fixed;
     inset: 0;
     z-index: 200;
-    background: var(--c-darkroom);
+    background: rgba(13, 11, 10, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     display: flex;
+  }
+
+  :global([data-theme="light"]) .nav-overlay {
+    background: rgba(242, 239, 233, 0.55);
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -466,7 +541,7 @@ function isActive(href: string): boolean {
   }
 
   .overlay-link:hover {
-    background: var(--c-negative);
+    background: color-mix(in srgb, var(--c-daylight) 8%, transparent);
   }
 
   .overlay-num {
@@ -504,12 +579,9 @@ function isActive(href: string): boolean {
     background: var(--c-tally);
   }
 
-  .overlay-link.active .overlay-num {
-    color: var(--c-daylight);
-  }
-
+  .overlay-link.active .overlay-num,
   .overlay-link.active .overlay-label {
-    color: var(--c-daylight);
+    color: var(--c-signal);
   }
 
   .overlay-link.active .overlay-dot {

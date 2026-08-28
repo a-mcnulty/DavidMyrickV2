@@ -1,10 +1,49 @@
 /* ==========================================================================
+   SELF-HOSTED FONTS
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/bebas-neue-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/barlow-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('/fonts/barlow-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('/fonts/barlow-condensed-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('/fonts/barlow-condensed-600.woff2') format('woff2');
+}
+
+/* ==========================================================================
    DESIGN TOKENS
-   All values derived from the approved design direction ("The Reel").
-   Breakpoints (for reference — can't use custom props in @media):
-     --bp-mobile:   < 640px
-     --bp-tablet:   640px – 1023px
-     --bp-desktop:  1024px+
    ========================================================================== */
 
 :root {
@@ -15,6 +54,7 @@
   --c-daylight:  #e8e4df;   /* Primary text — warm off-white                   */
   --c-tungsten:  #c4a46a;   /* Accent — warm practical light, used sparingly   */
   --c-tally:     #e63226;   /* Active/hover indicator — bright red tally light  */
+  --c-signal:    #fffd83;   /* Nav text — high-vis warm yellow                  */
 
   /* Derived / semi-transparent */
   --c-glass:          color-mix(in srgb, var(--c-darkroom) 92%, transparent);
