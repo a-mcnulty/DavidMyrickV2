@@ -1,0 +1,72 @@
+---
+// Staggered scroll-out / scroll-in for tile items during SPA navigation.
+---
+
+<script>
+  const STAGGER = 50;
+  const EXIT_MS = 350;
+  const ENTER_MS = 450;
+  const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+  function getVisibleTiles(): HTMLElement[] {
+    const tiles = Array.from(document.querySelectorAll<HTMLElement>('.tile-item'));
+    const vh = window.innerHeight;
+    return tiles.filter(tile => {
+      const rect = tile.getBoundingClientRect();
+      return rect.bottom > 0 && rect.top < vh;
+    });
+  }
+
+  function scrollOut(): Promise<void> {
+    const tiles = getVisibleTiles();
+    if (!tiles.length) return Promise.resolve();
+
+    return new Promise(resolve => {
+      tiles.forEach((tile, i) => {
+        tile.style.transition = `transform ${EXIT_MS}ms ${EASE} ${i * STAGGER}ms`;
+        tile.style.transform = 'translateY(-80%)';
+      });
+
+      setTimeout(resolve, (tiles.length - 1) * STAGGER + EXIT_MS);
+    });
+  }
+
+  function scrollIn() {
+    const tiles = Array.from(document.querySelectorAll<HTMLElement>('.tile-item'));
+    if (!tiles.length) return;
+
+    tiles.forEach(tile => {
+      tile.style.transition = 'none';
+      tile.style.transform = 'translateY(50%)';
+    });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        tiles.forEach((tile, i) => {
+          tile.style.transition = `transform ${ENTER_MS}ms ${EASE} ${i * STAGGER}ms`;
+          tile.style.transform = 'translateY(0)';
+        });
+
+        const totalTime = (tiles.length - 1) * STAGGER + ENTER_MS;
+        setTimeout(() => {
+          tiles.forEach(tile => {
+            tile.style.transition = '';
+            tile.style.transform = '';
+          });
+        }, totalTime);
+      });
+    });
+  }
+
+  document.addEventListener('astro:before-preparation', (e: any) => {
+    const originalLoader = e.loader;
+    e.loader = async () => {
+      await scrollOut();
+      await originalLoader();
+    };
+  });
+
+  document.addEventListener('astro:after-swap', () => {
+    scrollIn();
+  });
+</script>

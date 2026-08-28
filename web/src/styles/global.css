@@ -240,6 +240,19 @@ button {
 
 
 /* ==========================================================================
+   VIEW TRANSITIONS — kill all default visuals, we animate tiles via JS
+   ========================================================================== */
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
    TILE ASPECT RATIO (mobile-first: 4:3 → 16:9 → 2.39:1)
    ========================================================================== */
 
