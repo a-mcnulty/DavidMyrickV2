@@ -105,7 +105,7 @@ function isActive(href: string): boolean {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }
-  const saved = localStorage.getItem('theme') || 'light';
+  const saved = localStorage.getItem('theme') || 'dark';
   applyTheme(saved);
   themeBtn?.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme') || 'dark';

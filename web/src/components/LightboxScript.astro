@@ -1,11 +1,13 @@
 ---
-// Handles: tile background video (IntersectionObserver), lightbox open/close, full video lifecycle.
+// Handles: tile background video (Vimeo SDK), lightbox open/close, full video lifecycle.
 // Include once per page.
 ---
 
 <script>
+  import Player from '@vimeo/player';
+
   function init() {
-    // === Tile background videos: load Vimeo in background mode on scroll ===
+    // === Tile background videos: use Vimeo SDK for iOS autoplay support ===
     const tileObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -14,16 +16,23 @@
           if (!vimeoId) return;
 
           if (entry.isIntersecting && !tile.classList.contains('has-video')) {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1`;
-            iframe.className = 'tile-video';
-            iframe.setAttribute('loading', 'lazy');
-            iframe.setAttribute('tabindex', '-1');
+            tile.classList.add('has-video');
             const frame = tile.querySelector('.tile-frame');
-            if (frame) {
-              frame.appendChild(iframe);
-              tile.classList.add('has-video');
-            }
+            if (!frame) return;
+
+            const container = document.createElement('div');
+            container.className = 'tile-video';
+            frame.appendChild(container);
+
+            new Player(container, {
+              id: parseInt(vimeoId, 10),
+              background: true,
+              muted: true,
+              autoplay: true,
+              loop: true,
+              dnt: true,
+              responsive: false,
+            });
           }
         });
       },
@@ -37,22 +46,30 @@
     // === Lightbox open/close ===
     const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
     const lightboxes = document.querySelectorAll<HTMLElement>('[data-lightbox-id]');
+    const playerMap = new Map<HTMLElement, Player>();
 
     function openLightbox(id: string) {
       const lb = document.querySelector<HTMLElement>(`[data-lightbox-id="${id}"]`);
       if (!lb) return;
 
-      // Inject the full video iframe on open
       const wrapper = lb.querySelector<HTMLElement>('[data-full-vimeo-id]');
-      if (wrapper && !wrapper.querySelector('iframe')) {
+      if (wrapper && !playerMap.has(wrapper)) {
         const vimeoId = wrapper.dataset.fullVimeoId;
         if (vimeoId) {
-          const iframe = document.createElement('iframe');
-          iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&dnt=1`;
-          iframe.allow = 'autoplay; fullscreen';
-          iframe.allowFullscreen = true;
-          wrapper.appendChild(iframe);
+          const container = document.createElement('div');
+          container.className = 'lightbox-video';
+          wrapper.appendChild(container);
+
+          const player = new Player(container, {
+            id: parseInt(vimeoId, 10),
+            autoplay: true,
+            dnt: true,
+            responsive: false,
+          });
+          playerMap.set(wrapper, player);
         }
+      } else if (wrapper && playerMap.has(wrapper)) {
+        playerMap.get(wrapper)!.play();
       }
 
       lb.classList.add('open');
@@ -64,10 +81,12 @@
       lb.classList.remove('open');
       document.body.style.overflow = '';
 
-      // Remove iframe to stop playback
       const wrapper = lb.querySelector<HTMLElement>('[data-full-vimeo-id]');
-      const iframe = wrapper?.querySelector('iframe');
-      if (iframe) iframe.remove();
+      if (wrapper && playerMap.has(wrapper)) {
+        const player = playerMap.get(wrapper)!;
+        player.destroy();
+        playerMap.delete(wrapper);
+      }
     }
 
     triggers.forEach((trigger) => {

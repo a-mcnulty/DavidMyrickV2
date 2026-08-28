@@ -153,7 +153,8 @@ const dims = project.fullVideoDimensions;
     overflow: hidden;
   }
 
-  .player-wrapper :global(iframe) {
+  .player-wrapper :global(.lightbox-video),
+  .player-wrapper :global(.lightbox-video iframe) {
     position: absolute;
     inset: 0;
     width: 100%;
