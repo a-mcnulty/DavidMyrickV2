@@ -7,39 +7,56 @@
   import Player from '@vimeo/player';
 
   function init() {
-    // === Tile background videos: use Vimeo SDK for iOS autoplay support ===
+    // === Tile background videos: load first tile immediately, rest on scroll ===
+    let firstLoaded = false;
+
+    function loadTileVideo(tile: HTMLElement) {
+      if (tile.classList.contains('has-video')) return;
+      const vimeoId = tile.dataset.tileVimeo;
+      if (!vimeoId) return;
+
+      tile.classList.add('has-video');
+      const frame = tile.querySelector('.tile-frame');
+      if (!frame) return;
+
+      const container = document.createElement('div');
+      container.className = 'tile-video';
+      frame.appendChild(container);
+
+      new Player(container, {
+        id: parseInt(vimeoId, 10),
+        background: true,
+        muted: true,
+        autoplay: true,
+        loop: true,
+        dnt: true,
+        responsive: false,
+      });
+    }
+
+    const tiles = document.querySelectorAll<HTMLElement>('[data-tile-vimeo]');
+
+    // Load the first tile's video immediately
+    if (tiles.length > 0) {
+      loadTileVideo(tiles[0]);
+      firstLoaded = true;
+    }
+
+    // Observe the rest — only start when scrolled into view
     const tileObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const tile = entry.target as HTMLElement;
-          const vimeoId = tile.dataset.tileVimeo;
-          if (!vimeoId) return;
-
-          if (entry.isIntersecting && !tile.classList.contains('has-video')) {
-            tile.classList.add('has-video');
-            const frame = tile.querySelector('.tile-frame');
-            if (!frame) return;
-
-            const container = document.createElement('div');
-            container.className = 'tile-video';
-            frame.appendChild(container);
-
-            new Player(container, {
-              id: parseInt(vimeoId, 10),
-              background: true,
-              muted: true,
-              autoplay: true,
-              loop: true,
-              dnt: true,
-              responsive: false,
-            });
+          if (entry.isIntersecting) {
+            loadTileVideo(entry.target as HTMLElement);
+            tileObserver.unobserve(entry.target);
           }
         });
       },
       { rootMargin: '200px' }
     );
 
-    document.querySelectorAll<HTMLElement>('[data-tile-vimeo]').forEach((tile) => {
+    tiles.forEach((tile, i) => {
+      if (i === 0) return;
       tileObserver.observe(tile);
     });
 
