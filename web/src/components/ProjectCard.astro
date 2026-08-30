@@ -158,6 +158,10 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
     opacity: 0.6;
   }
 
+  :global([data-theme="light"]) .tile:hover .tile-overlay {
+    opacity: 1;
+  }
+
   .tile-subcategory {
     font-family: var(--font-utility);
     font-weight: var(--weight-medium);
@@ -172,7 +176,7 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
 
   .tile-title {
     font-family: var(--font-display);
-    font-size: var(--text-tile);
+    font-size: calc(var(--text-tile) * 1.1);
     text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     line-height: 1.05;
@@ -187,7 +191,7 @@ const fallbackSrc = urlFor(coverImage).width(1200).format('webp').url();
   .tile-director {
     font-family: var(--font-body);
     font-weight: var(--weight-regular);
-    font-size: var(--text-small);
+    font-size: calc(var(--text-small) * 1.15);
     color: #e8e4df;
     opacity: 0.7;
     margin-top: var(--space-2);

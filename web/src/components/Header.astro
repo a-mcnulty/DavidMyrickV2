@@ -1,8 +1,8 @@
 ---
 const navItems = [
-  { num: '01', label: 'Music Video', href: '/music-video' },
+  { num: '01', label: 'Narrative', href: '/narrative' },
   { num: '02', label: 'Commercial', href: '/commercial' },
-  { num: '03', label: 'Narrative', href: '/narrative' },
+  { num: '03', label: 'Music Video', href: '/music-video' },
   { num: '04', label: "Let's Talk", href: '/lets-talk' },
 ];
 
@@ -53,8 +53,8 @@ function isActive(href: string): boolean {
           href={href}
           class:list={['nav-tablet-link', { active: isActive(href) }]}
         >
-          <span class="tablet-label">{label}</span>
           <span class="tablet-dot" aria-hidden="true"></span>
+          <span class="tablet-label">{label}</span>
         </a>
       ))}
     </nav>
@@ -216,20 +216,22 @@ function isActive(href: string): boolean {
 
   .logo-name {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-size: clamp(1.5rem, 4vw, 1.8rem);
     text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     line-height: 1;
+    transform: scaleY(1.15) translateY(5px);
+    transform-origin: bottom;
   }
 
   .logo-role {
     font-family: var(--font-utility);
-    font-size: clamp(0.55rem, 1.2vw, 0.7rem);
+    font-size: clamp(calc(1.5rem * 0.45), calc(4vw * 0.45), calc(1.8rem * 0.48));
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
     color: var(--c-slate);
     line-height: 1;
-    margin-top: 3px;
+    margin-top: 1px;
   }
 
   .logo.active .logo-role {
@@ -320,8 +322,9 @@ function isActive(href: string): boolean {
     color: var(--c-daylight);
     padding: var(--space-3) var(--space-4);
     display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
     white-space: nowrap;
     border-left: 1px solid var(--c-daylight);
     border-right: 1px solid var(--c-daylight);
@@ -332,6 +335,19 @@ function isActive(href: string): boolean {
 
   .nav-tablet-link:first-child {
     margin-left: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-tablet-link {
+      padding: var(--space-3) var(--space-7) var(--space-3) var(--space-4);
+      flex-grow: 1;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .nav-tablet-link {
+      padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+    }
   }
 
   .nav-tablet-link:hover {
@@ -349,7 +365,7 @@ function isActive(href: string): boolean {
 
   .tablet-label {
     font-weight: var(--weight-semibold);
-    font-size: var(--text-utility);
+    font-size: clamp(calc(var(--text-utility) * 1.1), 1.2vw, calc(var(--text-utility) * 1.265));
         transition: color var(--duration-sm) var(--ease-out);
   }
 
@@ -358,7 +374,6 @@ function isActive(href: string): boolean {
     height: 6px;
     background: var(--c-slate);
     flex-shrink: 0;
-    margin-top: var(--space-1);
     transition: background var(--duration-sm) var(--ease-out);
   }
 
