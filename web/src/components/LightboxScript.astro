@@ -58,9 +58,10 @@
       });
     }
 
-    // Safari blocks autoplay until user interaction — wait for first gesture
+    // Safari blocks autoplay until user interaction — show posters and wait for first gesture
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     if (isSafari) {
+      tiles.forEach(tile => tile.classList.add('show-poster'));
       const events = ['click', 'touchstart', 'scroll', 'keydown'] as const;
       function onFirstInteraction() {
         events.forEach(e => document.removeEventListener(e, onFirstInteraction, { capture: true } as any));
