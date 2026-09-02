@@ -27,7 +27,8 @@ export type Project = {
   category: string;
   subcategory?: string;
   director?: string;
-  coverImage: SanityImageSource;
+  coverImage?: SanityImageSource;
+  vimeoThumbnail?: string;
   tileVideoUrl?: string;
   fullVideoUrl?: string;
   order?: number;
@@ -40,32 +41,47 @@ export function extractVimeoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-const dimensionsCache = new Map<string, VimeoDimensions | null>();
+type VimeoOembedData = {
+  dimensions: VimeoDimensions | null;
+  thumbnail: string | null;
+};
 
-async function fetchVimeoDimensions(vimeoUrl: string): Promise<VimeoDimensions | null> {
-  if (dimensionsCache.has(vimeoUrl)) return dimensionsCache.get(vimeoUrl)!;
+const oembedCache = new Map<string, VimeoOembedData>();
+
+async function fetchVimeoOembed(vimeoUrl: string): Promise<VimeoOembedData> {
+  if (oembedCache.has(vimeoUrl)) return oembedCache.get(vimeoUrl)!;
   try {
-    const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(vimeoUrl)}`);
-    if (!res.ok) { dimensionsCache.set(vimeoUrl, null); return null; }
+    const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(vimeoUrl)}&width=1280`);
+    if (!res.ok) { const empty = { dimensions: null, thumbnail: null }; oembedCache.set(vimeoUrl, empty); return empty; }
     const data = await res.json();
-    const dims = { width: data.width, height: data.height };
-    dimensionsCache.set(vimeoUrl, dims);
-    return dims;
+    const result: VimeoOembedData = {
+      dimensions: { width: data.width, height: data.height },
+      thumbnail: data.thumbnail_url ?? null,
+    };
+    oembedCache.set(vimeoUrl, result);
+    return result;
   } catch {
-    dimensionsCache.set(vimeoUrl, null);
-    return null;
+    const empty = { dimensions: null, thumbnail: null };
+    oembedCache.set(vimeoUrl, empty);
+    return empty;
   }
 }
 
 async function enrichProject(project: Project): Promise<Project> {
-  const [tileDims, fullDims] = await Promise.all([
-    project.tileVideoUrl ? fetchVimeoDimensions(project.tileVideoUrl) : null,
-    project.fullVideoUrl ? fetchVimeoDimensions(project.fullVideoUrl) : null,
+  const [tileOembed, fullOembed] = await Promise.all([
+    project.tileVideoUrl ? fetchVimeoOembed(project.tileVideoUrl) : null,
+    project.fullVideoUrl ? fetchVimeoOembed(project.fullVideoUrl) : null,
   ]);
+
+  const thumbnail = !project.coverImage
+    ? (tileOembed?.thumbnail ?? fullOembed?.thumbnail ?? undefined)
+    : undefined;
+
   return {
     ...project,
-    tileVideoDimensions: tileDims ?? undefined,
-    fullVideoDimensions: fullDims ?? undefined,
+    tileVideoDimensions: tileOembed?.dimensions ?? undefined,
+    fullVideoDimensions: fullOembed?.dimensions ?? undefined,
+    vimeoThumbnail: thumbnail,
   };
 }
 

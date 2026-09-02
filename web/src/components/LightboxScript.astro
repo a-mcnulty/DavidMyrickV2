@@ -36,13 +36,6 @@
 
     const tiles = document.querySelectorAll<HTMLElement>('[data-tile-vimeo]');
 
-    // Load the first tile's video immediately
-    if (tiles.length > 0) {
-      loadTileVideo(tiles[0]);
-      firstLoaded = true;
-    }
-
-    // Observe the rest — only start when scrolled into view
     const tileObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -55,10 +48,28 @@
       { rootMargin: '200px' }
     );
 
-    tiles.forEach((tile, i) => {
-      if (i === 0) return;
-      tileObserver.observe(tile);
-    });
+    function startTileVideos() {
+      if (tiles.length > 0) {
+        loadTileVideo(tiles[0]);
+      }
+      tiles.forEach((tile, i) => {
+        if (i === 0) return;
+        tileObserver.observe(tile);
+      });
+    }
+
+    // Safari blocks autoplay until user interaction — wait for first gesture
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isSafari) {
+      const events = ['click', 'touchstart', 'scroll', 'keydown'] as const;
+      function onFirstInteraction() {
+        events.forEach(e => document.removeEventListener(e, onFirstInteraction, { capture: true } as any));
+        startTileVideos();
+      }
+      events.forEach(e => document.addEventListener(e, onFirstInteraction, { capture: true, once: false, passive: true }));
+    } else {
+      startTileVideos();
+    }
 
     // === Lightbox open/close ===
     const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
