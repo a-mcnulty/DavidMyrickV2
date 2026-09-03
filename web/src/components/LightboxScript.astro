@@ -8,14 +8,12 @@
 
   function init() {
     // === Tile background videos: load first tile immediately, rest on scroll ===
-    let firstLoaded = false;
 
     function loadTileVideo(tile: HTMLElement) {
       if (tile.classList.contains('has-video')) return;
       const vimeoId = tile.dataset.tileVimeo;
       if (!vimeoId) return;
 
-      tile.classList.add('has-video');
       const frame = tile.querySelector('.tile-frame');
       if (!frame) return;
 
@@ -23,7 +21,7 @@
       container.className = 'tile-video';
       frame.appendChild(container);
 
-      new Player(container, {
+      const player = new Player(container, {
         id: parseInt(vimeoId, 10),
         background: true,
         muted: true,
@@ -31,6 +29,10 @@
         loop: true,
         dnt: true,
         responsive: false,
+      });
+
+      player.on('play', () => {
+        tile.classList.add('has-video');
       });
     }
 
@@ -58,19 +60,7 @@
       });
     }
 
-    // Safari blocks autoplay until user interaction — show posters and wait for first gesture
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    if (isSafari) {
-      tiles.forEach(tile => tile.classList.add('show-poster'));
-      const events = ['click', 'touchstart', 'scroll', 'keydown'] as const;
-      function onFirstInteraction() {
-        events.forEach(e => document.removeEventListener(e, onFirstInteraction, { capture: true } as any));
-        startTileVideos();
-      }
-      events.forEach(e => document.addEventListener(e, onFirstInteraction, { capture: true, once: false, passive: true }));
-    } else {
-      startTileVideos();
-    }
+    startTileVideos();
 
     // === Lightbox open/close ===
     const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
