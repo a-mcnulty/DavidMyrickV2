@@ -60,7 +60,8 @@ const fallbackSrc = hasSanityImage
         sizes={srcSet ? '100vw' : undefined}
         alt={title}
         loading={isFirst ? 'eager' : 'lazy'}
-        decoding={isFirst ? 'sync' : 'async'}
+        decoding="async"
+        fetchpriority={isFirst ? 'high' : undefined}
         width="1200"
         height="675"
       />
