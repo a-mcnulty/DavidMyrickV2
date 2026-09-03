@@ -46,20 +46,42 @@
           }
         });
       },
-      { rootMargin: '200px' }
+      { rootMargin: '0px' }
     );
 
-    function startTileVideos() {
-      if (tiles.length > 0) {
-        loadTileVideo(tiles[0]);
-      }
+    function observeRemainingTiles() {
       tiles.forEach((tile, i) => {
         if (i === 0) return;
         tileObserver.observe(tile);
       });
     }
 
-    startTileVideos();
+    function startTileVideos() {
+      if (tiles.length === 0) return;
+
+      const firstTile = tiles[0];
+      loadTileVideo(firstTile);
+
+      const firstPlayer = firstTile.querySelector('.tile-video');
+      if (firstPlayer) {
+        const checkPlay = () => {
+          if (firstTile.classList.contains('has-video')) {
+            observeRemainingTiles();
+          } else {
+            requestAnimationFrame(checkPlay);
+          }
+        };
+        requestAnimationFrame(checkPlay);
+      }
+
+      setTimeout(observeRemainingTiles, 8000);
+    }
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => startTileVideos());
+    } else {
+      setTimeout(startTileVideos, 200);
+    }
 
     // === Lightbox open/close ===
     const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
