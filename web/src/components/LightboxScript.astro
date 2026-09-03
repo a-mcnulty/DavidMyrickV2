@@ -4,9 +4,8 @@
 ---
 
 <script>
-  import Player from '@vimeo/player';
-
-  function init() {
+  async function init() {
+    const { default: Player } = await import('@vimeo/player');
     // === Tile background videos: load first tile immediately, rest on scroll ===
 
     function loadTileVideo(tile: HTMLElement) {
