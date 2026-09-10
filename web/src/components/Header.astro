@@ -209,6 +209,17 @@ function isActive(href: string): boolean {
     color: #111;
   }
 
+  @media (max-width: 639px) {
+    .logo.active {
+      color: var(--c-daylight);
+    }
+
+    .logo.active .logo-role {
+      color: var(--c-slate);
+      opacity: 1;
+    }
+  }
+
   .logo-text {
     display: flex;
     flex-direction: column;
@@ -232,6 +243,8 @@ function isActive(href: string): boolean {
     color: var(--c-slate);
     line-height: 1;
     margin-top: 1px;
+    text-align: justify;
+    text-align-last: justify;
   }
 
   .logo.active .logo-role {
