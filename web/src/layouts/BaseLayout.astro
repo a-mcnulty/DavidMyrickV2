@@ -33,6 +33,22 @@ const { title = 'David J Myrick — Director of Photography' } = Astro.props;
         });
       })();
     </script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-8VY31F22SJ"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-8VY31F22SJ');
+
+      document.addEventListener('astro:page-load', function() {
+        if (typeof gtag === 'function') {
+          gtag('event', 'page_view', {
+            page_location: window.location.href,
+            page_title: document.title
+          });
+        }
+      });
+    </script>
     <ClientRouter />
     <title>{title}</title>
   </head>
