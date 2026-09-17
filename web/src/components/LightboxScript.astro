@@ -89,6 +89,117 @@
     const triggers = document.querySelectorAll<HTMLElement>('[data-lightbox-trigger]');
     const lightboxes = document.querySelectorAll<HTMLElement>('[data-lightbox-id]');
     const playerMap = new Map<HTMLElement, Player>();
+    const controlsMap = new Map<HTMLElement, AbortController>();
+
+    function setupControls(lb: HTMLElement, wrapper: HTMLElement, player: any) {
+      const controls = wrapper.querySelector<HTMLElement>('.vp-controls');
+      const overlay = wrapper.querySelector<HTMLElement>('.vp-overlay');
+      if (!controls || !overlay) return;
+
+      const ac = new AbortController();
+      const sig = ac.signal;
+      controlsMap.set(wrapper, ac);
+
+      const playBtn = controls.querySelector<HTMLElement>('.vp-play')!;
+      const timeline = controls.querySelector<HTMLElement>('.vp-timeline')!;
+      const progress = controls.querySelector<HTMLElement>('.vp-progress')!;
+      const muteBtn = controls.querySelector<HTMLElement>('.vp-mute')!;
+      const volSlider = controls.querySelector<HTMLInputElement>('.vp-vol')!;
+      const fsBtn = controls.querySelector<HTMLElement>('.vp-fs')!;
+
+      let duration = 0;
+      let isPaused = false;
+      let hideTimer: number;
+
+      player.getDuration().then((d: number) => { duration = d; });
+
+      player.getPaused().then((p: boolean) => {
+        playBtn.classList.toggle('is-paused', p);
+      });
+
+      function showControls() {
+        controls.classList.add('visible');
+        clearTimeout(hideTimer);
+        if (!isPaused) {
+          hideTimer = window.setTimeout(() => controls.classList.remove('visible'), 3000);
+        }
+      }
+
+      function togglePlay() {
+        player.getPaused().then((p: boolean) => {
+          if (p) player.play();
+          else player.pause();
+        });
+      }
+
+      player.on('play', () => {
+        isPaused = false;
+        playBtn.classList.remove('is-paused');
+        showControls();
+      });
+
+      player.on('pause', () => {
+        isPaused = true;
+        playBtn.classList.add('is-paused');
+        showControls();
+      });
+
+      playBtn.addEventListener('click', togglePlay, { signal: sig });
+      overlay.addEventListener('click', () => { togglePlay(); showControls(); }, { signal: sig });
+
+      player.on('timeupdate', (data: { seconds: number }) => {
+        if (duration) progress.style.width = `${(data.seconds / duration) * 100}%`;
+      });
+
+      function seek(clientX: number) {
+        if (!duration) return;
+        const rect = timeline.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        player.setCurrentTime(pct * duration);
+        progress.style.width = `${pct * 100}%`;
+      }
+
+      let seeking = false;
+      timeline.addEventListener('pointerdown', (e: PointerEvent) => {
+        seeking = true;
+        timeline.setPointerCapture(e.pointerId);
+        seek(e.clientX);
+      }, { signal: sig });
+      timeline.addEventListener('pointermove', (e: PointerEvent) => {
+        if (seeking) seek(e.clientX);
+      }, { signal: sig });
+      timeline.addEventListener('pointerup', () => { seeking = false; }, { signal: sig });
+
+      muteBtn.addEventListener('click', () => {
+        player.getVolume().then((v: number) => {
+          player.setVolume(v > 0 ? 0 : 1);
+        });
+      }, { signal: sig });
+
+      player.on('volumechange', (data: { volume: number }) => {
+        muteBtn.classList.toggle('is-muted', data.volume === 0);
+        volSlider.value = String(data.volume);
+      });
+
+      volSlider.addEventListener('input', () => {
+        player.setVolume(parseFloat(volSlider.value));
+      }, { signal: sig });
+
+      fsBtn.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          wrapper.requestFullscreen();
+        }
+      }, { signal: sig });
+
+      overlay.addEventListener('mousemove', showControls, { signal: sig });
+      overlay.addEventListener('touchstart', showControls, { signal: sig, passive: true });
+      controls.addEventListener('mousemove', showControls, { signal: sig });
+      controls.addEventListener('mouseenter', showControls, { signal: sig });
+
+      showControls();
+    }
 
     function openLightbox(id: string) {
       const lb = document.querySelector<HTMLElement>(`[data-lightbox-id="${id}"]`);
@@ -114,6 +225,10 @@
           const player = new Player(container, {
             id: parseInt(vimeoId, 10),
             autoplay: true,
+            controls: false,
+            title: false,
+            byline: false,
+            portrait: false,
             dnt: true,
             responsive: false,
           });
@@ -168,6 +283,8 @@
               }
             });
           });
+
+          setupControls(lb, wrapper, player);
         }
       } else if (wrapper && playerMap.has(wrapper)) {
         playerMap.get(wrapper)!.play();
@@ -183,10 +300,20 @@
       document.body.style.overflow = '';
 
       const wrapper = lb.querySelector<HTMLElement>('[data-full-vimeo-id]');
-      if (wrapper && playerMap.has(wrapper)) {
-        const player = playerMap.get(wrapper)!;
-        player.destroy();
-        playerMap.delete(wrapper);
+      if (wrapper) {
+        if (controlsMap.has(wrapper)) {
+          controlsMap.get(wrapper)!.abort();
+          controlsMap.delete(wrapper);
+        }
+        const controls = wrapper.querySelector<HTMLElement>('.vp-controls');
+        const progress = wrapper.querySelector<HTMLElement>('.vp-progress');
+        if (controls) controls.classList.remove('visible');
+        if (progress) progress.style.width = '0%';
+
+        if (playerMap.has(wrapper)) {
+          playerMap.get(wrapper)!.destroy();
+          playerMap.delete(wrapper);
+        }
       }
     }
 
