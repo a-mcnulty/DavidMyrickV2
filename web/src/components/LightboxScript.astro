@@ -129,6 +129,12 @@
           });
           playerMap.set(wrapper, player);
 
+          const overlay = document.createElement('div');
+          overlay.className = 'plyr-click-overlay';
+          overlay.style.cssText = 'position:absolute;inset:0;z-index:2;cursor:pointer;';
+          overlay.addEventListener('click', () => player.togglePlay());
+          wrapper.querySelector('.plyr')?.appendChild(overlay);
+
           const videoTitle = lb.getAttribute('aria-label') || 'Unknown';
           const milestones = new Set<number>();
 

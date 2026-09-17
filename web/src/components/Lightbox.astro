@@ -166,6 +166,7 @@ const dims = project.fullVideoDimensions;
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
+    max-height: 100%;
     background: var(--c-darkroom);
     overflow: hidden;
   }
@@ -174,6 +175,7 @@ const dims = project.fullVideoDimensions;
     position: absolute;
     inset: 0;
     height: 100%;
+    overflow: hidden;
   }
 
   .player-wrapper :global(.plyr__video-embed) {
