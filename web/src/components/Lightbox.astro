@@ -178,6 +178,14 @@ const dims = project.fullVideoDimensions;
     overflow: hidden;
   }
 
+  .player-wrapper :global(.plyr--fullscreen-fallback) {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10000000 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
   .player-wrapper :global(.plyr__video-embed) {
     height: 100%;
     padding-bottom: 0 !important;
