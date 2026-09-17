@@ -115,7 +115,11 @@ function isActive(href: string): boolean {
     const themeBtn = document.querySelector('.theme-toggle');
     themeBtn?.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme') || 'dark';
-      applyTheme(current === 'dark' ? 'light' : 'dark');
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      if (typeof gtag === 'function') {
+        gtag('event', 'theme_toggle', { theme: next });
+      }
     });
 
     const toggle = document.querySelector('.menu-toggle');

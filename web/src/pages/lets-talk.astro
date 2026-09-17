@@ -223,3 +223,30 @@ import Footer from '../components/Footer.astro';
     color: var(--c-daylight);
   }
 </style>
+
+<script>
+  function initLetsTalkTracking() {
+    document.querySelectorAll<HTMLAnchorElement>('.contact-email').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (typeof gtag === 'function') {
+          const contactType = link.closest('.contact-block')?.querySelector('.contact-type')?.textContent || 'unknown';
+          gtag('event', 'mailto_click', {
+            contact_type: contactType,
+          });
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLAnchorElement>('.social-links a').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (typeof gtag === 'function') {
+          const label = link.textContent?.trim() || 'unknown';
+          if (label === 'Resume') {
+            gtag('event', 'resume_download');
+          }
+        }
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initLetsTalkTracking);
+</script>

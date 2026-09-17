@@ -93,3 +93,18 @@ const socialLinks = [
     color: var(--c-daylight);
   }
 </style>
+
+<script>
+  function initFooterTracking() {
+    document.querySelectorAll<HTMLAnchorElement>('.social-link').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (typeof gtag === 'function') {
+          gtag('event', 'social_click', {
+            platform: link.getAttribute('aria-label') || 'unknown',
+          });
+        }
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initFooterTracking);
+</script>

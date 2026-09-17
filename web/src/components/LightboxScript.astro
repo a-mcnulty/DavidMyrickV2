@@ -94,6 +94,15 @@
       const lb = document.querySelector<HTMLElement>(`[data-lightbox-id="${id}"]`);
       if (!lb) return;
 
+      if (typeof gtag === 'function') {
+        const videoTitle = lb.getAttribute('aria-label') || 'Unknown';
+        const category = window.location.pathname.replace(/\//g, '') || 'home';
+        gtag('event', 'project_view', {
+          project_title: videoTitle,
+          page_category: category,
+        });
+      }
+
       const wrapper = lb.querySelector<HTMLElement>('[data-full-vimeo-id]');
       if (wrapper && !playerMap.has(wrapper)) {
         const vimeoId = wrapper.dataset.fullVimeoId;
