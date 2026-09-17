@@ -48,25 +48,7 @@ const dims = project.fullVideoDimensions;
           data-full-vimeo-id={fullVimeoId}
           style={dims ? `aspect-ratio: ${dims.width} / ${dims.height}` : undefined}
         >
-          {/* Iframe injected on open by LightboxScript */}
-          <div class="vp-overlay"></div>
-          <div class="vp-controls">
-            <button class="vp-play" type="button" aria-label="Play">
-              <svg class="vp-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20" /></svg>
-              <svg class="vp-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
-            </button>
-            <div class="vp-timeline">
-              <div class="vp-track"><div class="vp-progress"></div></div>
-            </div>
-            <button class="vp-mute" type="button" aria-label="Mute">
-              <svg class="vp-icon-vol" width="18" height="18" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" /><path d="M15.54 8.46a5 5 0 010 7.07" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /><path d="M19.07 4.93a10 10 0 010 14.14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
-              <svg class="vp-icon-muted" width="18" height="18" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" /><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
-            </button>
-            <input type="range" class="vp-vol" min="0" max="1" step="0.01" value="1" aria-label="Volume" />
-            <button class="vp-fs" type="button" aria-label="Full screen">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" /></svg>
-            </button>
-          </div>
+          {/* Player injected on open by LightboxScript (Plyr + Vimeo) */}
         </div>
       </div>
     </div>
@@ -80,6 +62,7 @@ const dims = project.fullVideoDimensions;
     z-index: 500;
     display: flex;
     flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     opacity: 0;
     visibility: hidden;
     transition: opacity var(--duration-md) var(--ease-out),
@@ -99,14 +82,22 @@ const dims = project.fullVideoDimensions;
   }
 
   .lightbox-header {
-    position: relative;
-    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: var(--space-4) var(--space-5);
-    min-height: var(--nav-height);
-    flex-shrink: 0;
+    padding-top: max(var(--space-4), env(safe-area-inset-top, 0px));
+    background: linear-gradient(rgba(0, 0, 0, 0.6), transparent);
+    pointer-events: none;
+  }
+
+  .lightbox-header > * {
+    pointer-events: auto;
   }
 
   .lightbox-meta {
@@ -156,6 +147,7 @@ const dims = project.fullVideoDimensions;
     flex: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 0;
     min-height: 0;
     overflow: hidden;
@@ -163,143 +155,39 @@ const dims = project.fullVideoDimensions;
 
   .lightbox-player {
     width: 100%;
-    max-height: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
 
   .player-wrapper {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    max-height: calc(100vh - var(--nav-height));
     background: var(--c-darkroom);
     overflow: hidden;
   }
 
-  .player-wrapper :global(.lightbox-video),
-  .player-wrapper :global(.lightbox-video iframe) {
+  .player-wrapper :global(.plyr) {
     position: absolute;
     inset: 0;
+    height: 100%;
+  }
+
+  .player-wrapper :global(.plyr__video-embed) {
+    height: 100%;
+    padding-bottom: 0 !important;
+  }
+
+  .player-wrapper :global(.plyr__video-embed iframe) {
     width: 100%;
     height: 100%;
     border: 0;
   }
 
-  /* --- Custom video controls --- */
-
-  .vp-play .vp-icon-pause { display: none; }
-  .vp-play.is-paused .vp-icon-play { display: none; }
-  .vp-play.is-paused .vp-icon-pause { display: block; }
-
-  .vp-mute .vp-icon-muted { display: none; }
-  .vp-mute.is-muted .vp-icon-vol { display: none; }
-  .vp-mute.is-muted .vp-icon-muted { display: block; }
-
-  .vp-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    cursor: pointer;
-  }
-
-  .vp-controls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .vp-controls.visible {
-    opacity: 1;
-  }
-
-  .vp-controls button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    opacity: 0.9;
-    transition: opacity 0.2s ease;
-  }
-
-  .vp-controls button:hover {
-    opacity: 1;
-  }
-
-  .vp-timeline {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    height: 28px;
-    cursor: pointer;
-  }
-
-  .vp-track {
-    width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
-    position: relative;
-    overflow: hidden;
-    transition: height 0.15s ease;
-  }
-
-  .vp-timeline:hover .vp-track {
-    height: 5px;
-  }
-
-  .vp-progress {
-    height: 100%;
-    background: var(--c-tally);
-    width: 0%;
-    border-radius: 2px;
-    pointer-events: none;
-  }
-
-  .vp-vol {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 64px;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .vp-vol::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #fff;
-    cursor: pointer;
-  }
-
-  .vp-vol::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #fff;
-    border: none;
-    cursor: pointer;
-  }
-
-  @media (max-width: 639px) {
-    .vp-mute,
-    .vp-vol {
-      display: none;
-    }
+  .player-wrapper {
+    --plyr-color-main: var(--c-tally);
   }
 </style>
