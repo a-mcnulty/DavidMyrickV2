@@ -87,13 +87,12 @@ function isActive(href: string): boolean {
       </svg>
     </button>
     <ul class="overlay-list">
-      {navItems.map(({ num, label, href }) => (
+      {navItems.map(({ label, href }) => (
         <li>
           <a
             href={href}
             class:list={['overlay-link', { active: isActive(href) }]}
           >
-            <span class="overlay-num">{num}</span>
             <span class="overlay-label-row">
               <span class="overlay-dot" aria-hidden="true"></span>
               <span class="overlay-label">{label}</span>
@@ -574,6 +573,7 @@ function isActive(href: string): boolean {
   .overlay-label-row {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-3);
   }
 
