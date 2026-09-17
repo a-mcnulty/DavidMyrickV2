@@ -4,6 +4,8 @@
 ---
 
 <script>
+  declare function gtag(...args: any[]): void;
+
   async function init() {
     const { default: Player } = await import('@vimeo/player');
     // === Tile background videos: load first tile immediately, rest on scroll ===
@@ -107,6 +109,56 @@
             responsive: false,
           });
           playerMap.set(wrapper, player);
+
+          const videoTitle = lb.getAttribute('aria-label') || 'Unknown';
+          const milestones = new Set<number>();
+
+          player.getDuration().then((duration: number) => {
+            player.on('play', () => {
+              if (typeof gtag === 'function') {
+                gtag('event', 'video_start', {
+                  video_title: videoTitle,
+                  video_provider: 'vimeo',
+                  video_url: `https://vimeo.com/${vimeoId}`,
+                });
+              }
+            });
+
+            player.on('pause', () => {
+              if (typeof gtag === 'function') {
+                gtag('event', 'video_pause', {
+                  video_title: videoTitle,
+                  video_provider: 'vimeo',
+                });
+              }
+            });
+
+            player.on('ended', () => {
+              if (typeof gtag === 'function') {
+                gtag('event', 'video_complete', {
+                  video_title: videoTitle,
+                  video_provider: 'vimeo',
+                });
+              }
+            });
+
+            player.on('timeupdate', (data: { seconds: number }) => {
+              if (!duration) return;
+              const pct = Math.floor((data.seconds / duration) * 100);
+              for (const mark of [25, 50, 75]) {
+                if (pct >= mark && !milestones.has(mark)) {
+                  milestones.add(mark);
+                  if (typeof gtag === 'function') {
+                    gtag('event', 'video_progress', {
+                      video_title: videoTitle,
+                      video_provider: 'vimeo',
+                      video_percent: mark,
+                    });
+                  }
+                }
+              }
+            });
+          });
         }
       } else if (wrapper && playerMap.has(wrapper)) {
         playerMap.get(wrapper)!.play();
