@@ -92,7 +92,9 @@ const dims = project.fullVideoDimensions;
     justify-content: space-between;
     padding: var(--space-4) var(--space-5);
     padding-top: max(var(--space-4), env(safe-area-inset-top, 0px));
-    background: linear-gradient(rgba(0, 0, 0, 0.6), transparent);
+    background: linear-gradient(rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     pointer-events: none;
   }
 
@@ -112,7 +114,8 @@ const dims = project.fullVideoDimensions;
     font-size: clamp(0.9rem, 2vw, 1.2rem);
     text-transform: uppercase;
     letter-spacing: var(--tracking-display);
-    color: var(--c-daylight);
+    color: #e8e4df;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -121,7 +124,8 @@ const dims = project.fullVideoDimensions;
   .lightbox-director {
     font-family: var(--font-body);
     font-size: var(--text-small);
-    color: var(--c-slate);
+    color: rgba(232, 228, 223, 0.75);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
     letter-spacing: var(--tracking-normal);
     white-space: nowrap;
   }
@@ -132,13 +136,14 @@ const dims = project.fullVideoDimensions;
     justify-content: center;
     width: var(--tap-min);
     height: var(--tap-min);
-    color: var(--c-daylight);
+    color: #e8e4df;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
     flex-shrink: 0;
     transition: color var(--duration-sm) var(--ease-out);
   }
 
   .lightbox-close:hover {
-    color: var(--c-tungsten);
+    color: #ffffff;
   }
 
   .lightbox-content {
