@@ -1,0 +1,144 @@
+---
+import type { Subcategory } from '../lib/sanity';
+
+interface Props {
+  subcategories: Subcategory[];
+}
+
+const { subcategories } = Astro.props;
+if (subcategories.length === 0) return;
+---
+
+<div class="subcategory-filter" data-subcategory-filter>
+  <button class="filter-btn active" data-filter="all">
+    <span class="filter-dot" aria-hidden="true"></span>
+    <span class="filter-label">All</span>
+  </button>
+  {subcategories.map((sub) => (
+    <button class="filter-btn" data-filter={sub.name}>
+      <span class="filter-dot" aria-hidden="true"></span>
+      <span class="filter-label">{sub.name}</span>
+    </button>
+  ))}
+</div>
+
+<style>
+  .subcategory-filter {
+    position: fixed;
+    top: calc(var(--header-total) - 13px);
+    z-index: 201;
+    display: flex;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+  }
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-utility);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-utility);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--c-daylight);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--c-daylight);
+    margin-left: -1px;
+    white-space: nowrap;
+    background: var(--c-darkroom);
+    transition: color var(--duration-sm) var(--ease-out),
+                background var(--duration-sm) var(--ease-out);
+  }
+
+  :global([data-theme="light"]) .filter-btn {
+    background: #ffffff;
+  }
+
+  .filter-btn:first-child {
+    margin-left: 0;
+  }
+
+  .filter-btn:hover {
+    background: var(--c-negative);
+  }
+
+  .filter-label {
+    font-weight: var(--weight-semibold);
+    transition: color var(--duration-sm) var(--ease-out);
+  }
+
+  .filter-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--c-slate);
+    flex-shrink: 0;
+    transition: background var(--duration-sm) var(--ease-out);
+  }
+
+  .filter-btn:hover .filter-dot {
+    background: var(--c-tally);
+  }
+
+  .filter-btn.active .filter-dot {
+    background: var(--c-tally);
+  }
+
+  .filter-btn.active .filter-label {
+    color: var(--c-signal);
+  }
+
+  :global([data-theme="light"]) .filter-btn.active .filter-label {
+    color: #111;
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    function positionFilterBar() {
+      var bar = document.querySelector('[data-subcategory-filter]');
+      if (!bar) return;
+      var link = document.querySelector('.nav-tablet-link.active') ||
+                 document.querySelector('.nav-cell.active');
+      if (!link) return;
+      var rect = link.getBoundingClientRect();
+      var center = rect.left + rect.width / 2;
+      var w = bar.offsetWidth;
+      var left = Math.max(0, Math.min(center - w / 2, window.innerWidth - w));
+      bar.style.left = left + 'px';
+    }
+    positionFilterBar();
+    window.addEventListener('resize', positionFilterBar);
+    document.addEventListener('astro:after-swap', positionFilterBar);
+  })();
+</script>
+
+<script>
+  function initSubcategoryFilter() {
+    const filterBar = document.querySelector<HTMLElement>('[data-subcategory-filter]');
+    if (!filterBar) return;
+
+    const buttons = filterBar.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const tiles = document.querySelectorAll<HTMLElement>('[data-subcategory-name]');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+
+        buttons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        tiles.forEach((tile) => {
+          if (filter === 'all' || tile.dataset.subcategoryName === filter) {
+            tile.style.display = '';
+          } else {
+            tile.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initSubcategoryFilter);
+</script>

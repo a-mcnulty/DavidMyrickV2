@@ -37,8 +37,19 @@ export default defineType({
     defineField({
       name: 'subcategory',
       title: 'Type',
-      type: 'string',
-      description: 'Appears above the title on the tile (e.g. "Feature Film", "Music Video", "2nd Unit Cinematography").',
+      type: 'reference',
+      to: [{ type: 'subcategory' }],
+      description: 'Appears above the title on the tile. Only shows subcategories matching this project\'s category.',
+      options: {
+        filter: ({ document }) => {
+          const category = document?.category
+          if (!category) return { filter: 'hidden != true' }
+          return {
+            filter: 'category == $category && hidden != true',
+            params: { category },
+          }
+        },
+      },
     }),
     defineField({
       name: 'director',

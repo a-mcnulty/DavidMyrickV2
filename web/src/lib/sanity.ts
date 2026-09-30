@@ -89,9 +89,22 @@ async function enrichProjects(projects: Project[]): Promise<Project[]> {
   return Promise.all(projects.map(enrichProject));
 }
 
+export type Subcategory = {
+  _id: string;
+  name: string;
+  category: string;
+};
+
+export async function getSubcategoriesByCategory(category: string): Promise<Subcategory[]> {
+  return client.fetch(
+    `*[_type == "subcategory" && category == $category && hidden != true] | order(name asc)`,
+    { category }
+  );
+}
+
 export async function getProjectsByCategory(category: string): Promise<Project[]> {
   const projects = await client.fetch(
-    `*[_type == "project" && category == $category] | order(order asc, title asc)`,
+    `*[_type == "project" && category == $category] | order(order asc, title asc) { ..., "subcategory": subcategory->name }`,
     { category }
   );
   return enrichProjects(projects);
@@ -99,14 +112,14 @@ export async function getProjectsByCategory(category: string): Promise<Project[]
 
 export async function getAllProjects(): Promise<Project[]> {
   const projects = await client.fetch(
-    `*[_type == "project"] | order(order asc, title asc)`
+    `*[_type == "project"] | order(order asc, title asc) { ..., "subcategory": subcategory->name }`
   );
   return enrichProjects(projects);
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   const project = await client.fetch(
-    `*[_type == "project" && slug.current == $slug][0]`,
+    `*[_type == "project" && slug.current == $slug][0] { ..., "subcategory": subcategory->name }`,
     { slug }
   );
   return project ? enrichProject(project) : null;

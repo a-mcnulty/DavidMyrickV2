@@ -5,27 +5,30 @@ import Footer from '../components/Footer.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Lightbox from '../components/Lightbox.astro';
 import LightboxScript from '../components/LightboxScript.astro';
-import { getProjectsByCategory } from '../lib/sanity';
+import { getProjectsByCategory, getSubcategoriesByCategory } from '../lib/sanity';
 
 const projects = await getProjectsByCategory('music-video');
+const subcategories = await getSubcategoriesByCategory('music-video');
 ---
 
 <BaseLayout title="Music Video — David J Myrick">
-  <Header />
+  <Header subcategories={subcategories} />
   <main>
     {projects.length > 0 ? (
       <section class="tile-stack">
         {projects.map((project, i) => (
-          <ProjectCard
-            id={project._id}
-            title={project.title}
-            coverImage={project.coverImage}
-            subcategory={project.subcategory}
-            director={project.director}
-            tileVideoUrl={project.tileVideoUrl}
-            tileVideoDimensions={project.tileVideoDimensions}
-            index={i}
-          />
+          <div data-subcategory-name={project.subcategory || ''}>
+            <ProjectCard
+              id={project._id}
+              title={project.title}
+              coverImage={project.coverImage}
+              subcategory={project.subcategory}
+              director={project.director}
+              tileVideoUrl={project.tileVideoUrl}
+              tileVideoDimensions={project.tileVideoDimensions}
+              index={i}
+            />
+          </div>
         ))}
       </section>
     ) : (
