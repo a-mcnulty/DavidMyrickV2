@@ -104,7 +104,7 @@ export async function getSubcategoriesByCategory(category: string): Promise<Subc
 
 export async function getProjectsByCategory(category: string): Promise<Project[]> {
   const projects = await client.fetch(
-    `*[_type == "project" && category == $category] | order(order asc, title asc) { ..., "subcategory": subcategory->name }`,
+    `*[_type == "project" && category == $category] | order(order asc, title asc) { ..., "subcategory": select(subcategory->hidden == true => null, subcategory->name) }`,
     { category }
   );
   return enrichProjects(projects);
@@ -112,14 +112,14 @@ export async function getProjectsByCategory(category: string): Promise<Project[]
 
 export async function getAllProjects(): Promise<Project[]> {
   const projects = await client.fetch(
-    `*[_type == "project"] | order(order asc, title asc) { ..., "subcategory": subcategory->name }`
+    `*[_type == "project"] | order(order asc, title asc) { ..., "subcategory": select(subcategory->hidden == true => null, subcategory->name) }`
   );
   return enrichProjects(projects);
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   const project = await client.fetch(
-    `*[_type == "project" && slug.current == $slug][0] { ..., "subcategory": subcategory->name }`,
+    `*[_type == "project" && slug.current == $slug][0] { ..., "subcategory": select(subcategory->hidden == true => null, subcategory->name) }`,
     { slug }
   );
   return project ? enrichProject(project) : null;
