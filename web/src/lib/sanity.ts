@@ -92,14 +92,29 @@ async function enrichProjects(projects: Project[]): Promise<Project[]> {
 export type Subcategory = {
   _id: string;
   name: string;
+  slug: string;
   category: string;
 };
 
 export async function getSubcategoriesByCategory(category: string): Promise<Subcategory[]> {
   return client.fetch(
-    `*[_type == "subcategory" && category == $category && hidden != true] | order(name asc)`,
+    `*[_type == "subcategory" && category == $category && hidden != true && defined(slug.current)] | order(name asc) { _id, name, "slug": slug.current, category }`,
     { category }
   );
+}
+
+export async function getAllVisibleSubcategories(): Promise<Subcategory[]> {
+  return client.fetch(
+    `*[_type == "subcategory" && hidden != true && defined(slug.current)] | order(name asc) { _id, name, "slug": slug.current, category }`
+  );
+}
+
+export async function getProjectsByCategoryAndSubcategory(category: string, subcategorySlug: string): Promise<Project[]> {
+  const projects = await client.fetch(
+    `*[_type == "project" && category == $category && subcategory->slug.current == $subcategorySlug && subcategory->hidden != true] | order(order asc, title asc) { ..., "subcategory": subcategory->name }`,
+    { category, subcategorySlug }
+  );
+  return enrichProjects(projects);
 }
 
 export async function getProjectsByCategory(category: string): Promise<Project[]> {

@@ -12,6 +12,14 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      description: 'URL-friendly name — click Generate.',
+      options: { source: 'name', maxLength: 96 },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'category',
       title: 'Parent Category',
       type: 'string',

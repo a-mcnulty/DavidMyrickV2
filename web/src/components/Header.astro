@@ -3,9 +3,10 @@ import type { Subcategory } from '../lib/sanity';
 
 interface Props {
   subcategories?: Subcategory[];
+  activeSubcategory?: string;
 }
 
-const { subcategories = [] } = Astro.props;
+const { subcategories = [], activeSubcategory } = Astro.props;
 
 const navItems = [
   { num: '01', label: 'Narrative', href: '/narrative' },
@@ -66,16 +67,16 @@ function isActive(href: string): boolean {
             <span class="tablet-label">{label}</span>
           </a>
           {isActive(href) && subcategories.length > 0 && (
-            <div class="subcategory-filter" data-subcategory-filter>
-              <button class="filter-btn active" data-filter="all">
+            <div class="subcategory-filter">
+              <a href={href} class:list={['filter-btn', { active: !activeSubcategory }]}>
                 <span class="filter-dot" aria-hidden="true"></span>
                 <span class="filter-label">All</span>
-              </button>
+              </a>
               {subcategories.map((sub) => (
-                <button class="filter-btn" data-filter={sub.name}>
+                <a href={`${href}/${sub.slug}`} class:list={['filter-btn', { active: activeSubcategory === sub.slug }]}>
                   <span class="filter-dot" aria-hidden="true"></span>
                   <span class="filter-label">{sub.name}</span>
-                </button>
+                </a>
               ))}
             </div>
           )}
@@ -123,12 +124,12 @@ function isActive(href: string): boolean {
             </span>
           </a>
           {isActive(href) && subcategories.length > 0 && (
-            <div class="overlay-subcategories" data-subcategory-filter-mobile>
+            <div class="overlay-subcategories">
               {subcategories.map((sub) => (
-                <button class="overlay-sub-btn" data-filter-mobile={sub.name}>
+                <a href={`${href}/${sub.slug}`} class:list={['overlay-sub-btn', { active: activeSubcategory === sub.slug }]}>
                   <span class="overlay-sub-dot" aria-hidden="true"></span>
                   <span class="overlay-sub-label">{sub.name}</span>
-                </button>
+                </a>
               ))}
             </div>
           )}
@@ -179,36 +180,6 @@ function isActive(href: string): boolean {
       document.body.style.overflow = '';
     });
 
-    // Subcategory filter (tablet/desktop + mobile)
-    const tiles = document.querySelectorAll<HTMLElement>('[data-subcategory-name]');
-    const allFilterBtns = [
-      ...document.querySelectorAll<HTMLButtonElement>('[data-filter]'),
-      ...document.querySelectorAll<HTMLButtonElement>('[data-filter-mobile]'),
-    ];
-
-    function applyFilter(filter: string) {
-      allFilterBtns.forEach((b) => b.classList.remove('active'));
-      allFilterBtns.forEach((b) => {
-        const val = b.dataset.filter || b.dataset.filterMobile;
-        if (val === filter) b.classList.add('active');
-      });
-      tiles.forEach((tile) => {
-        tile.style.display = (filter === 'all' || tile.dataset.subcategoryName === filter) ? '' : 'none';
-      });
-    }
-
-    allFilterBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter || btn.dataset.filterMobile || 'all';
-        applyFilter(filter);
-
-        if (btn.dataset.filterMobile !== undefined) {
-          toggle?.setAttribute('aria-expanded', 'false');
-          overlay?.classList.remove('open');
-          document.body.style.overflow = '';
-        }
-      });
-    });
   }
 
   document.addEventListener('astro:page-load', initHeader);

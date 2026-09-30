@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import Lightbox from '../../components/Lightbox.astro';
+import LightboxScript from '../../components/LightboxScript.astro';
+import {
+  getAllVisibleSubcategories,
+  getProjectsByCategoryAndSubcategory,
+  getSubcategoriesByCategory,
+} from '../../lib/sanity';
+
+const categoryLabels: Record<string, string> = {
+  'music-video': 'Music Video',
+  commercial: 'Commercial',
+  narrative: 'Narrative',
+};
+
+export async function getStaticPaths() {
+  const subcategories = await getAllVisibleSubcategories();
+  return subcategories.map((sub) => ({
+    params: { category: sub.category, subcategory: sub.slug },
+    props: { subcategoryName: sub.name },
+  }));
+}
+
+const { category, subcategory } = Astro.params;
+const { subcategoryName } = Astro.props;
+
+const projects = await getProjectsByCategoryAndSubcategory(category!, subcategory!);
+const subcategories = await getSubcategoriesByCategory(category!);
+const categoryLabel = categoryLabels[category!] ?? category;
+---
+
+<BaseLayout title={`${subcategoryName} — ${categoryLabel} — David J Myrick`}>
+  <Header subcategories={subcategories} activeSubcategory={subcategory} />
+  <main>
+    {projects.length > 0 ? (
+      <section class="tile-stack">
+        {projects.map((project, i) => (
+          <div>
+            <ProjectCard
+              id={project._id}
+              title={project.title}
+              coverImage={project.coverImage}
+              subcategory={project.subcategory}
+              director={project.director}
+              tileVideoUrl={project.tileVideoUrl}
+              tileVideoDimensions={project.tileVideoDimensions}
+              index={i}
+            />
+          </div>
+        ))}
+      </section>
+    ) : (
+      <p class="empty">No projects yet.</p>
+    )}
+
+    {projects.map((project) => (
+      <Lightbox project={project} />
+    ))}
+  </main>
+  <Footer />
+  <LightboxScript />
+</BaseLayout>
+
+<style>
+  .tile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: var(--header-total);
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--c-slate);
+    padding: var(--space-9) 0;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+  }
+</style>
