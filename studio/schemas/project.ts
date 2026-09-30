@@ -43,9 +43,9 @@ export default defineType({
       options: {
         filter: ({ document }) => {
           const category = document?.category
-          if (!category) return { filter: 'hidden != true' }
+          if (!category) return { filter: '' }
           return {
-            filter: 'category == $category && hidden != true',
+            filter: 'category == $category',
             params: { category },
           }
         },
