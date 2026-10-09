@@ -8,6 +8,7 @@ interface Props {
   title: string;
   coverImage?: SanityImageSource;
   vimeoThumbnail?: string;
+  tileDescription?: string;
   subcategory?: string;
   director?: string;
   tileVideoUrl?: string;
@@ -20,6 +21,7 @@ const {
   title,
   coverImage,
   vimeoThumbnail,
+  tileDescription,
   subcategory,
   director,
   tileVideoUrl,
@@ -70,8 +72,8 @@ const fallbackSrc = hasSanityImage
 
   {/* Text overlay */}
   <div class="tile-overlay">
-    {subcategory && (
-      <span class="tile-subcategory">{subcategory}</span>
+    {(tileDescription || subcategory) && (
+      <span class="tile-subcategory">{tileDescription || subcategory}</span>
     )}
     <h2 class="tile-title">{title}</h2>
     {director && (

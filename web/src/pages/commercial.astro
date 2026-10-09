@@ -17,11 +17,12 @@ const subcategories = await getSubcategoriesByCategory('commercial');
     {projects.length > 0 ? (
       <section class="tile-stack">
         {projects.map((project, i) => (
-          <div data-subcategory-name={project.subcategory || ''}>
+          <div>
             <ProjectCard
               id={project._id}
               title={project.title}
               coverImage={project.coverImage}
+              tileDescription={project.tileDescription}
               subcategory={project.subcategory}
               director={project.director}
               tileVideoUrl={project.tileVideoUrl}

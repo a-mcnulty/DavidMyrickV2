@@ -52,6 +52,12 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'tileDescription',
+      title: 'Tile Description',
+      type: 'string',
+      description: 'Appears above the title on the tile.',
+    }),
+    defineField({
       name: 'director',
       title: 'Director',
       type: 'string',

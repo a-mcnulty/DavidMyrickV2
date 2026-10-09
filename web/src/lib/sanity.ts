@@ -25,6 +25,7 @@ export type Project = {
   title: string;
   slug: { current: string };
   category: string;
+  tileDescription?: string;
   subcategory?: string;
   director?: string;
   coverImage?: SanityImageSource;
