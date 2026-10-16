@@ -118,7 +118,7 @@
           wrapper.appendChild(container);
 
           const player = new Plyr(container, {
-            controls: ['play', 'progress', 'fullscreen'],
+            controls: ['play', 'progress', 'mute', 'volume', 'fullscreen'],
             autoplay: true,
             fullscreen: { enabled: true, fallback: true, iosNative: true },
             vimeo: {
@@ -130,11 +130,63 @@
           });
           playerMap.set(wrapper, player);
 
+          // Mobile browsers refuse autoplay with sound, so Vimeo quietly falls
+          // back to muted playback without telling Plyr. Read the embed's real
+          // state once playback starts and offer a way back to sound.
+          const unmuteBtn = document.createElement('button');
+          unmuteBtn.type = 'button';
+          unmuteBtn.className = 'plyr-unmute';
+          unmuteBtn.setAttribute('aria-label', 'Turn on sound');
+          unmuteBtn.hidden = true;
+          unmuteBtn.innerHTML =
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+            '<path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M19 5a9 9 0 0 1 0 14" />' +
+            '</svg><span>Tap for sound</span>';
+
+          let soundResolved = false;
+
+          function enableSound() {
+            soundResolved = true;
+            unmuteBtn.hidden = true;
+            player.muted = false;
+            if (player.paused) player.play();
+          }
+
+          async function syncMutedState() {
+            if (soundResolved || !player.embed) return;
+            try {
+              if (await player.embed.getMuted()) {
+                // Keep Plyr's own mute control in sync with the embed.
+                player.muted = true;
+                unmuteBtn.hidden = false;
+              } else {
+                soundResolved = true;
+              }
+            } catch {
+              /* embed not ready yet; a later 'playing' will retry */
+            }
+          }
+
+          unmuteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            enableSound();
+          });
+          player.on('playing', syncMutedState);
+
           const overlay = document.createElement('div');
           overlay.className = 'plyr-click-overlay';
           overlay.style.cssText = 'position:absolute;inset:0;z-index:2;cursor:pointer;';
-          overlay.addEventListener('click', () => player.togglePlay());
-          wrapper.querySelector('.plyr')?.appendChild(overlay);
+          overlay.addEventListener('click', () => {
+            if (!unmuteBtn.hidden) {
+              enableSound();
+              return;
+            }
+            player.togglePlay();
+          });
+
+          const plyrRoot = wrapper.querySelector('.plyr');
+          plyrRoot?.appendChild(overlay);
+          plyrRoot?.appendChild(unmuteBtn);
 
           const videoTitle = lb.getAttribute('aria-label') || 'Unknown';
           const milestones = new Set<number>();

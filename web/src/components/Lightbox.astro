@@ -205,4 +205,37 @@ const dims = project.fullVideoDimensions;
   .player-wrapper {
     --plyr-color-main: #555;
   }
+
+  /* Shown when the browser forced muted autoplay (mobile). */
+  .player-wrapper :global(.plyr-unmute) {
+    position: absolute;
+    z-index: 4;
+    top: max(var(--space-5), calc(env(safe-area-inset-top, 0px) + var(--space-5)));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-min);
+    padding: 0 var(--space-4);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #e8e4df;
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    letter-spacing: var(--tracking-normal);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--duration-sm) var(--ease-out);
+  }
+
+  .player-wrapper :global(.plyr-unmute:hover) {
+    background: rgba(0, 0, 0, 0.88);
+  }
+
+  .player-wrapper :global(.plyr-unmute[hidden]) {
+    display: none;
+  }
 </style>
